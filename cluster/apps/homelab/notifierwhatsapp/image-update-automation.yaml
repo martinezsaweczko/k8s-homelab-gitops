@@ -21,7 +21,7 @@ spec:
         chore: update notifierwhatsapp image to {{ .AutomationObject }}
 
         Images:
-        {{ range .Updated -}}
+        {{ range .Changed -}}
         - {{.Object.Kind}}/{{.Object.Name}}: {{.OldImage}} -> {{.NewImage}}
         {{ end -}}
     push:
