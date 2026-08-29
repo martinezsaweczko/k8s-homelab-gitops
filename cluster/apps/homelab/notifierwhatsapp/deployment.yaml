@@ -18,7 +18,7 @@ spec:
       containers:
         - name: notifierwhatsapp
           # Flux ImagePolicy: flux-system/notifierwhatsapp
-          image: ghcr.io/martinezsaweczko/notifierwhatsapp:1.0.2 # {"$imagepolicy": "flux-system:notifierwhatsapp"}
+          image: ghcr.io/martinezsaweczko/notifierwhatsapp:1.0.4 # {"$imagepolicy": "flux-system:notifierwhatsapp"}
           imagePullPolicy: IfNotPresent
           args:
             - -http-address=0.0.0.0
