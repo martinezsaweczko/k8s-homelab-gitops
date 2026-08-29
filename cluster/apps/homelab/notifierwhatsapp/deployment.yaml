@@ -47,11 +47,12 @@ spec:
           volumeMounts:
             - name: session
               mountPath: /data
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 65532
-            runAsGroup: 65532
-            readOnlyRootFilesystem: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        readOnlyRootFilesystem: true
       volumes:
         - name: session
           persistentVolumeClaim:
