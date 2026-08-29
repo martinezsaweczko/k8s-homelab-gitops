@@ -26,8 +26,3 @@ spec:
         {{ end -}}
     push:
       branch: flux-image-updates
-  policy:
-    objectRef:
-      kind: ImagePolicy
-      name: notifierwhatsapp
-      namespace: flux-system
