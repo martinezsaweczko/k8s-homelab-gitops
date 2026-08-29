@@ -19,10 +19,5 @@ spec:
         email: flux@martinezsaweczko.com
       messageTemplate: |
         chore: update notifierwhatsapp image to {{ .AutomationObject }}
-
-        Images:
-        {{ range .Changed -}}
-        - {{.Object.Kind}}/{{.Object.Name}}: {{.OldImage}} -> {{.NewImage}}
-        {{ end -}}
     push:
       branch: flux-image-updates
