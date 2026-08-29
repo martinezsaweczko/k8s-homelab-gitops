@@ -18,12 +18,13 @@ spec:
       containers:
         - name: notifierwhatsapp
           # Flux ImagePolicy: flux-system/notifierwhatsapp
-          image: ghcr.io/martinezsaweczko/notifierwhatsapp:1.0.1 # {"$imagepolicy": "flux-system:notifierwhatsapp"}
+          image: ghcr.io/martinezsaweczko/notifierwhatsapp:1.0.2 # {"$imagepolicy": "flux-system:notifierwhatsapp"}
           imagePullPolicy: IfNotPresent
           args:
             - -http-address=0.0.0.0
             - -whatsapp-session-db=/data/whatsapp.db
             - -o11-prometheus-path=/metrics
+            - -swagger-host=172.26.20.33:8080
           ports:
             - name: http
               containerPort: 8080
