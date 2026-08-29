@@ -1,0 +1,33 @@
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: notifierwhatsapp
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: Flux Bot
+        email: flux@martinezsaweczko.com
+      messageTemplate: |
+        chore: update notifierwhatsapp image to {{ .AutomationObject }}
+
+        Images:
+        {{ range .UpdatedObjects -}}
+        - {{.Object.Kind}}/{{.Object.Name}}: {{.OldImage}} -> {{.NewImage}}
+        {{ end -}}
+    push:
+      branch: flux-image-updates
+  policy:
+    objectRef:
+      kind: ImagePolicy
+      name: notifierwhatsapp
+      namespace: flux-system

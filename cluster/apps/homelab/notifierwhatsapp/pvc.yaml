@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: whatsapp-session
+  namespace: notifierwhatsapp
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ceph-csi-cephfs
+  resources:
+    requests:
+      storage: 200Mi

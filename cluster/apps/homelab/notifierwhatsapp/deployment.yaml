@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifierwhatsapp
+  namespace: notifierwhatsapp
+  labels:
+    app: notifierwhatsapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifierwhatsapp
+  template:
+    metadata:
+      labels:
+        app: notifierwhatsapp
+    spec:
+      containers:
+        - name: notifierwhatsapp
+          # Flux ImagePolicy: flux-system/notifierwhatsapp
+          image: ghcr.io/martinezsaweczko/notifierwhatsapp:1.0.1 # {"$imagepolicy": "flux-system:notifierwhatsapp"}
+          imagePullPolicy: IfNotPresent
+          args:
+            - -http-address=0.0.0.0
+            - -whatsapp-session-db=/data/whatsapp.db
+            - -o11-prometheus-path=/metrics
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: session
+              mountPath: /data
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: session
+          persistentVolumeClaim:
+            claimName: whatsapp-session

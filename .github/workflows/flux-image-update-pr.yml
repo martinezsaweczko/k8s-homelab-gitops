@@ -1,0 +1,32 @@
+name: Flux Image Update PR
+
+on:
+  push:
+    branches:
+      - flux-image-updates
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: flux-image-updates
+          fetch-depth: 0
+
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          base: main
+          branch: flux-image-updates
+          title: "chore: update notifierwhatsapp image"
+          body: |
+            Automated image update from Flux.
+
+            Please review the tag change before merging.
+          delete-branch: false
