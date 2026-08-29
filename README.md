@@ -99,3 +99,18 @@ If the cluster is completely rebuilt:
 1. Run the [k8s-homelab](https://github.com/martinezsaweczko/k8s-homelab) Ansible playbooks
 2. If `flux bootstrap` fails due to Deploy Keys being disabled, follow the manual wiring steps in the [infrastructure repo's Flux troubleshooting guide](https://github.com/martinezsaweczko/k8s-homelab/blob/main/docs/FLUX_GITOPS.md)
 3. The cluster pulls this repo and self-heals to the current desired state
+
+
+## Troubleshooting
+
+How to get syncronization progress
+
+```
+flux get kustomizations -A
+```
+
+```
+flux-system     cluster                 False           False   ImageUpdateAutomation/notifierwhatsapp/notifierwhatsapp dry-run failed: failed to create typed patch object (notifierwhatsapp/notifierwhatsapp; image.toolkit.fluxcd.io/v1, Kind=ImageUpdateAutomation): .spec.policy: field not declared in schema
+```
+
+Check the different options via flux --help
