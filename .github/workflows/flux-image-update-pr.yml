@@ -6,7 +6,7 @@ on:
       - flux-image-updates
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -16,17 +16,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: flux-image-updates
+          ref: main
           fetch-depth: 0
 
       - name: Create or update pull request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          base: main
-          branch: flux-image-updates
-          title: "chore: update notifierwhatsapp image"
-          body: |
-            Automated image update from Flux.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Fetch the flux-image-updates branch so gh can see it
+          git fetch origin flux-image-updates
 
-            Please review the tag change before merging.
-          delete-branch: false
+          # Create PR if it doesn't exist; ignore error if it already exists
+          gh pr create \
+            --base main \
+            --head flux-image-updates \
+            --title "chore: update notifierwhatsapp image" \
+            --body "Automated image update from Flux." \
+            --repo ${{ github.repository }} \
+            || true
