@@ -11,7 +11,6 @@ spec:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
       name: homelab-proxy-config
-      namespace: gateway
   addresses:
     - type: IPAddress
       value: 172.26.20.34

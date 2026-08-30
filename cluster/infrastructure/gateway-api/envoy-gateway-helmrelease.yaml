@@ -17,15 +17,16 @@ spec:
       interval: 12h
   install:
     createNamespace: true
-    crds: CreateReplace
     remediation:
       retries: 3
   upgrade:
-    crds: CreateReplace
     remediation:
       retries: 3
   targetNamespace: envoy-gateway-system
   values:
+    # Gateway API CRDs are managed separately by this repo.
+    crds:
+      enabled: false
     deployment:
       envoyGateway:
         resources:
