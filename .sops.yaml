@@ -1,3 +1,4 @@
 creation_rules:
   - path_regex: cluster/.*\.sops\.yaml$
-    age: age1p5dhqw2e4j320s53mzujg9qnptftlhc8gl5xwpt2dc8mz5dhtfjscaaruf
+    age: age1kga6y9njjc2ykcuj9qapq677mkelkh5x5pxnjf647tk933267c2qjaw694
+    
