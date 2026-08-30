@@ -1,0 +1,54 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: prometheus-snmp-exporter
+  namespace: flux-system
+spec:
+  interval: 1h
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: flux-system
+  chart:
+    spec:
+      chart: prometheus-snmp-exporter
+      version: "9.x"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      interval: 12h
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  targetNamespace: monitoring
+  values:
+    service:
+      type: ClusterIP
+    serviceMonitor:
+      enabled: true
+      path: /snmp
+      module:
+        - mikrotik
+      auth:
+        - public_v2
+      selector:
+        release: monitoring-kube-prometheus-stack
+      params:
+        - name: mikrotik-router-1
+          target: 172.26.0.1
+          module:
+            - mikrotik
+          auth:
+            - public_v2
+        - name: mikrotik-router-2
+          target: 172.26.32.1
+          module:
+            - mikrotik
+          auth:
+            - public_v2
