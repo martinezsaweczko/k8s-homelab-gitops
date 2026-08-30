@@ -7,3 +7,21 @@ resources:
   - snmp-exporter-helmrelease.yaml
   - httproute.yaml
   - grafana-admin-secret.sops.yaml
+
+configMapGenerator:
+  - name: grafana-dashboard-mikrotik-14420
+    namespace: monitoring
+    files:
+      - dashboards/mikrotik-14420.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      disableNameSuffixHash: true
+  - name: grafana-dashboard-mikrotik-14857
+    namespace: monitoring
+    files:
+      - dashboards/mikrotik-14857.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      disableNameSuffixHash: true
