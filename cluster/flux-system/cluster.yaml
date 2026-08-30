@@ -12,18 +12,7 @@ spec:
     kind: GitRepository
     name: k8s-homelab-gitops
     namespace: flux-system
-  wait: true
-  timeout: 10m
   decryption:
     provider: sops
     secretRef:
       name: sops-age
-  healthChecks:
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: image-reflector-controller
-      namespace: flux-system
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: image-automation-controller
-      namespace: flux-system

@@ -14,8 +14,6 @@ spec:
   wait: true
   timeout: 10m
   dependsOn:
-    - name: cluster
-      namespace: flux-system
     - name: gateway-config
       namespace: flux-system
   decryption:
