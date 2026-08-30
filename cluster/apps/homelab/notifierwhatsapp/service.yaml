@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: notifierwhatsapp
   namespace: notifierwhatsapp
+  labels:
+    app: notifierwhatsapp
 spec:
   type: LoadBalancer
   loadBalancerIP: 172.26.20.33
