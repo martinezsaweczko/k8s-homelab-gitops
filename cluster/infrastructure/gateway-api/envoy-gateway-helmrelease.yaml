@@ -26,9 +26,6 @@ spec:
     remediation:
       retries: 3
   targetNamespace: envoy-gateway-system
-  dependsOn:
-    - name: gateway-api-crds
-      namespace: flux-system
   values:
     deployment:
       envoyGateway:
