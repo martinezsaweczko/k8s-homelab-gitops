@@ -1,0 +1,68 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: flux-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: "61.x"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      interval: 12h
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  targetNamespace: monitoring
+  dependsOn:
+    - name: gateway-api-crds
+      namespace: flux-system
+  values:
+    # Do not deploy the bundled ingress; we use Gateway API.
+    grafana:
+      enabled: true
+      admin:
+        existingSecret: grafana-admin
+        userKey: admin-user
+        passwordKey: admin-password
+      # No default ingress / service exposure. Gateway API route is used instead.
+      service:
+        type: ClusterIP
+      # Default dashboards are enabled by default.
+
+    prometheus:
+      enabled: true
+      prometheusSpec:
+        retention: 15d
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: ceph-csi-rbd
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+
+    alertmanager:
+      enabled: false
+
+    nodeExporter:
+      enabled: true
+
+    kubeStateMetrics:
+      enabled: true
