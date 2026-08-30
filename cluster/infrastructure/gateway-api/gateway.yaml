@@ -6,11 +6,6 @@ metadata:
   namespace: gateway
 spec:
   gatewayClassName: envoy-gateway
-  infrastructure:
-    parametersRef:
-      group: gateway.envoyproxy.io
-      kind: EnvoyProxy
-      name: homelab-proxy-config
   addresses:
     - type: IPAddress
       value: 172.26.20.34
