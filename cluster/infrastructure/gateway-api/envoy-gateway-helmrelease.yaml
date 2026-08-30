@@ -32,7 +32,6 @@ spec:
           requests:
             cpu: 100m
             memory: 256Mi
-    # Use a LoadBalancer service so MetalLB (installed by Ansible) assigns an external IP.
+    # Control plane service does not need an external LoadBalancer IP.
     service:
-      type: LoadBalancer
-      loadBalancerIP: 172.26.20.34
+      type: ClusterIP

@@ -6,6 +6,9 @@ metadata:
   namespace: gateway
 spec:
   gatewayClassName: envoy-gateway
+  addresses:
+    - type: IPAddress
+      value: 172.26.20.34
   listeners:
     - name: http
       protocol: HTTP
