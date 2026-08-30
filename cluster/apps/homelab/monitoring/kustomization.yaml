@@ -4,5 +4,6 @@ resources:
   - namespace.yaml
   - helmrepository.yaml
   - helmrelease.yaml
+  - servicemonitor-notifierwhatsapp.yaml
   - httproute.yaml
   - grafana-admin-secret.sops.yaml
