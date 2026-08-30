@@ -29,5 +29,4 @@ jobs:
             --head flux-image-updates \
             --base main \
             --title "chore: automated image update" \
-            --body "This PR was created automatically by Flux image automation." \
-            --label automation
+            --body "This PR was created automatically by Flux image automation."
