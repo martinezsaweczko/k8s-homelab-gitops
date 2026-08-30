@@ -5,6 +5,7 @@ resources:
   - pvc.yaml
   - deployment.yaml
   - service.yaml
-  - image-repository.yaml
-  - image-policy.yaml
-  - image-update-automation.yaml
+  # Image automation resources are disabled until Flux image-reflector CRDs are installed.
+  # - image-repository.yaml
+  # - image-policy.yaml
+  # - image-update-automation.yaml
