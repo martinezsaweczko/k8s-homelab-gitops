@@ -6,4 +6,5 @@ resources:
   - gatewayclass.yaml
   - envoy-gateway-helmrepository.yaml
   - envoy-gateway-helmrelease.yaml
+  - envoyproxy.yaml
   - gateway.yaml
