@@ -16,3 +16,7 @@ spec:
   dependsOn:
     - name: gateway-config
       namespace: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
