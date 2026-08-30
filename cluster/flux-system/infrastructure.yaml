@@ -1,0 +1,15 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure
+  namespace: flux-system
+spec:
+  interval: 1h
+  path: ./cluster/infrastructure
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: k8s-homelab-gitops
+  wait: true
+  timeout: 10m
