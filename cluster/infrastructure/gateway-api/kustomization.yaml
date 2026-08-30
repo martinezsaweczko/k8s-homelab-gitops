@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - crds.yaml
   - namespace.yaml
+  - gatewayclass.yaml
   - envoy-gateway-helmrepository.yaml
   - envoy-gateway-helmrelease.yaml
   - gateway.yaml
