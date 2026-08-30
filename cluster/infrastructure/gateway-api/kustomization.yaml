@@ -5,4 +5,5 @@ resources:
   - namespace.yaml
   - gatewayclass.yaml
   - envoy-gateway-helmrepository.yaml
+  - envoy-gateway-crds-helmrelease.yaml
   - envoy-gateway-helmrelease.yaml

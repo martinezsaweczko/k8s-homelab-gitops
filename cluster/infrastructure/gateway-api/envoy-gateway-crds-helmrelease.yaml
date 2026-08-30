@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: envoy-gateway
+  name: envoy-gateway-crds
   namespace: flux-system
 spec:
   interval: 1h
   chart:
     spec:
-      chart: gateway-helm
+      chart: gateway-crds-helm
       version: "v1.9.0"
       sourceRef:
         kind: HelmRepository
@@ -16,26 +16,15 @@ spec:
         namespace: flux-system
       interval: 12h
   install:
-    createNamespace: true
     remediation:
       retries: 3
   upgrade:
     remediation:
       retries: 3
   targetNamespace: envoy-gateway-system
-  dependsOn:
-    - name: envoy-gateway-crds
-      namespace: flux-system
   values:
-    # Gateway API CRDs are managed separately by this repo.
     crds:
-      enabled: false
-    deployment:
+      gatewayAPI:
+        enabled: false
       envoyGateway:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-    # Control plane service does not need an external LoadBalancer IP.
-    service:
-      type: ClusterIP
+        enabled: true
