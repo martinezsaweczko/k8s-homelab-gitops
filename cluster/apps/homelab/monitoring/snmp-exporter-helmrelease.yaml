@@ -35,6 +35,7 @@ spec:
       path: /snmp
       module:
         - mikrotik
+        - if_mib
       auth:
         - public_v2
       selector:
@@ -44,11 +45,13 @@ spec:
           target: 172.26.0.1
           module:
             - mikrotik
+            - if_mib
           auth:
             - public_v2
         - name: mikrotik-router-2
           target: 172.26.32.1
           module:
             - mikrotik
+            - if_mib
           auth:
             - public_v2
