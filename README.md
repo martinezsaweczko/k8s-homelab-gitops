@@ -221,6 +221,88 @@ Make sure the new Age private key is installed in the cluster as the `sops-age` 
 
 The Age private key is stored in the cluster as a Kubernetes Secret `sops-age` in the `flux-system` namespace. Flux uses it to decrypt `.sops.yaml` files during reconciliation. The private key **never** enters this repository.
 
+## Upgrading Components
+
+All upgrades in this repository are done through Git. Flux reconciles the changes automatically after you push.
+
+### Upgrading a Helm chart
+
+Each Helm chart version is pinned in the corresponding `HelmRelease` under `spec.chart.spec.version`.
+
+For example, to upgrade cert-manager:
+
+```yaml
+# cluster/infrastructure/cert-manager/helmrelease.yaml
+spec:
+  chart:
+    spec:
+      version: "1.16.0"   # change this
+```
+
+Then commit and push:
+
+```bash
+git add cluster/infrastructure/cert-manager/helmrelease.yaml
+git commit -m "chore(cert-manager): upgrade cert-manager to v1.16.0"
+git push
+```
+
+Flux will upgrade the release automatically.
+
+### Helm charts managed in this repo
+
+| Component | File to edit |
+|-----------|--------------|
+| cert-manager | `cluster/infrastructure/cert-manager/helmrelease.yaml` |
+| cert-manager-webhook-ionos | `cluster/infrastructure/cert-manager-webhook-ionos/helmrelease.yaml` |
+| Envoy Gateway | `cluster/infrastructure/gateway-api/envoy-gateway-helmrelease.yaml` |
+| kube-prometheus-stack | `cluster/apps/homelab/monitoring/helmrelease.yaml` |
+| prometheus-snmp-exporter | `cluster/apps/homelab/monitoring/snmp-exporter-helmrelease.yaml` |
+
+### Upgrading Flux components
+
+Flux itself is installed from `cluster/flux-system/gotk-components.yaml`. To upgrade Flux:
+
+```bash
+flux install \
+  --components-extra=image-reflector-controller,image-automation-controller \
+  --export > cluster/flux-system/gotk-components.yaml
+```
+
+Then commit and push.
+
+### Upgrading raw Kubernetes manifests
+
+For resources like `Gateway`, `HTTPRoute`, `Deployment`, `ConfigMap`, etc., edit the manifest directly and push.
+
+### Upgrading container images
+
+`notifierwhatsapp` image updates are automated via Flux `ImageUpdateAutomation`. The workflow is:
+
+1. `ImageRepository` scans the registry.
+2. `ImagePolicy` selects the latest matching tag.
+3. `ImageUpdateAutomation` updates the deployment image and pushes to the `flux-image-updates` branch.
+4. A GitHub Actions workflow opens a PR.
+
+You can add the same pattern to other applications by creating `ImageRepository`, `ImagePolicy`, and `ImageUpdateAutomation` resources.
+
+### Verify the upgrade
+
+After pushing, force reconciliation and watch the status:
+
+```bash
+flux reconcile source git k8s-homelab-gitops
+flux reconcile kustomization cluster
+flux get kustomizations
+flux get helmreleases -A
+```
+
+Check that the new version is running:
+
+```bash
+kubectl get deployment -n <namespace> <deployment-name> -o jsonpath='{.spec.template.spec.containers[0].image}'
+```
+
 ## Adding a New Application
 
 1. Create a new directory under `cluster/apps/homelab/<app-name>/`
