@@ -1,16 +1,27 @@
 ---
-# Workaround: cert-manager-webhook-ionos chart binds the domain-solver role to
-# the 'cert-manager' service account, but the actual cert-manager deployment uses
-# 'cert-manager-cert-manager'. This binding grants the solver permission to the
-# correct service account.
+# The cert-manager-webhook-ionos chart creates a ClusterRole with
+# resources: ["*.acme.fabmade.de"] which does not match the actual resource
+# "ionos" in API group "acme.fabmade.de". This ClusterRole fixes that.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cert-manager-cert-manager-webhook-ionos:domain-solver-fixed
+rules:
+  - apiGroups:
+      - "acme.fabmade.de"
+    resources:
+      - "ionos"
+    verbs:
+      - "create"
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: cert-manager-cert-manager-webhook-ionos:domain-solver-cert-manager-sa
+  name: cert-manager-cert-manager-webhook-ionos:domain-solver-fixed
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cert-manager-cert-manager-webhook-ionos:domain-solver
+  name: cert-manager-cert-manager-webhook-ionos:domain-solver-fixed
 subjects:
   - kind: ServiceAccount
     name: cert-manager-cert-manager
