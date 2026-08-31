@@ -1,0 +1,24 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: flux@martinezsaweczko.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.fabmade.de
+            solverName: ionos
+            config:
+              apiUrl: https://api.hosting.ionos.com/dns/v1
+              publicKeySecretRef:
+                key: IONOS_PUBLIC_PREFIX
+                name: ionos-secret
+              secretKeySecretRef:
+                key: IONOS_SECRET
+                name: ionos-secret

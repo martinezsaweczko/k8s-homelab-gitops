@@ -2,19 +2,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: gateway-config
+  name: cert-manager
   namespace: flux-system
 spec:
   interval: 1h
-  path: ./cluster/infrastructure/gateway-config
+  path: ./cluster/infrastructure/cert-manager
   prune: true
   sourceRef:
     kind: GitRepository
     name: k8s-homelab-gitops
+    namespace: flux-system
   wait: true
-  timeout: 5m
-  dependsOn:
-    - name: infrastructure
-      namespace: flux-system
-    - name: cert-manager-issuers
-      namespace: flux-system
+  timeout: 10m
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

@@ -22,3 +22,15 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "grafana.martinez-saweczko.es"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: grafana-tls
+            namespace: gateway
+      allowedRoutes:
+        namespaces:
+          from: All

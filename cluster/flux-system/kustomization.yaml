@@ -4,5 +4,8 @@ resources:
   - gotk-components.yaml
   - cluster.yaml
   - infrastructure.yaml
+  - cert-manager.yaml
+  - cert-manager-webhook-ionos.yaml
+  - cert-manager-issuers.yaml
   - gateway-config.yaml
   - apps.yaml

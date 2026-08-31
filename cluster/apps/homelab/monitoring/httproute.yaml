@@ -8,7 +8,7 @@ spec:
   parentRefs:
     - name: homelab-gateway
       namespace: gateway
-      sectionName: http
+      sectionName: https
   hostnames:
     - "grafana.martinez-saweczko.es"
   rules:

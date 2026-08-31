@@ -4,3 +4,4 @@ resources:
   - gatewayclass.yaml
   - envoyproxy.yaml
   - gateway.yaml
+  - grafana-https-redirect.yaml
