@@ -31,7 +31,7 @@ spec:
     prometheus:
       enabled: true
       # Do not enable the chart's ServiceMonitor: the ServiceMonitor CRD is
-      # installed later by kube-prometheus-stack. Scraping is configured from
-      # the monitoring layer via cluster/apps/homelab/monitoring/cert-manager-servicemonitor.yaml.
+      # installed later by kube-prometheus-stack. Scraping is configured by
+      # kube-prometheus-stack's additionalServiceMonitors.
       servicemonitor:
         enabled: false

@@ -7,7 +7,6 @@ resources:
   - snmp-exporter-helmrelease.yaml
   - httproute.yaml
   - grafana-admin-secret.sops.yaml
-  - cert-manager-servicemonitor.yaml
 
 configMapGenerator:
   - name: grafana-dashboard-mikrotik-14420
