@@ -265,11 +265,14 @@ Flux itself is installed from `cluster/flux-system/gotk-components.yaml`. To upg
 
 ```bash
 flux install \
+  --version=v2.9.5 \
   --components-extra=image-reflector-controller,image-automation-controller \
   --export > cluster/flux-system/gotk-components.yaml
 ```
 
 Then commit and push.
+
+> **Important:** `gotk-components.yaml` must always be generated with `--components-extra=image-reflector-controller,image-automation-controller` because the `notifierwhatsapp` app uses `ImageRepository`, `ImagePolicy`, and `ImageUpdateAutomation` CRDs.
 
 ### Upgrading raw Kubernetes manifests
 
@@ -321,7 +324,18 @@ If the cluster is completely rebuilt:
 
 1. Run the [k8s-homelab](https://github.com/martinezsaweczko/k8s-homelab) Ansible playbooks
 2. If `flux bootstrap` fails due to Deploy Keys being disabled, follow the manual wiring steps in the [infrastructure repo's Flux troubleshooting guide](https://github.com/martinezsaweczko/k8s-homelab/blob/main/docs/FLUX_GITOPS.md)
-3. The cluster pulls this repo and self-heals to the current desired state
+3. When bootstrapping Flux manually, always include the image automation controllers:
+
+   ```bash
+   flux bootstrap github \
+     --owner=martinezsaweczko \
+     --repository=k8s-homelab-gitops \
+     --branch=main \
+     --path=cluster \
+     --components-extra=image-reflector-controller,image-automation-controller
+   ```
+
+4. The cluster pulls this repo and self-heals to the current desired state
 
 
 ## Troubleshooting
