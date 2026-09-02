@@ -30,7 +30,8 @@ spec:
       - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
     prometheus:
       enabled: true
-      # ServiceMonitor CRDs are provided later by kube-prometheus-stack.
-      # Re-enable this once the monitoring stack is installed.
+      # Do not enable the chart's ServiceMonitor: the ServiceMonitor CRD is
+      # installed later by kube-prometheus-stack. Scraping is configured from
+      # the monitoring layer via cluster/apps/homelab/monitoring/cert-manager-servicemonitor.yaml.
       servicemonitor:
         enabled: false
