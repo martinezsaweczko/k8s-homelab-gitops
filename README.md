@@ -154,6 +154,14 @@ sops secret.sops.yaml
 
 This opens your `$EDITOR` with the decrypted contents. Save and exit to re-encrypt automatically.
 
+### Retrieving a Secret Value
+
+To read a single value without opening an editor, decrypt and grep. For example, the MySQL root password:
+
+```bash
+sops --decrypt cluster/apps/homelab/mysql/mysql-secret.sops.yaml | grep mysql-root-password
+```
+
 ### Rotating or Replacing the Age Key
 
 If the Age private key is lost or rotated (for example, after recreating the cluster without preserving the previous key), the existing encrypted secrets can no longer be decrypted. You must re-encrypt them with the new key.
