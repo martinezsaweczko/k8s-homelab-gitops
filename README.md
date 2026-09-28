@@ -26,7 +26,8 @@ cluster/
 └── apps/
     └── homelab/              # Applications deployed to the homelab cluster
         ├── notifierwhatsapp/
-        └── monitoring/       # Prometheus + Grafana
+        ├── monitoring/       # Prometheus + Grafana
+        └── mysql/            # MySQL database
 ```
 
 ## Flux Kustomization Layers & Dependencies
@@ -65,7 +66,7 @@ cluster (root Kustomization, reconciles everything)
 | `cert-manager-webhook-ionos` | `./cluster/infrastructure/cert-manager-webhook-ionos` | Installs IONOS DNS webhook for DNS-01 challenges | `cert-manager` |
 | `cert-manager-issuers` | `./cluster/infrastructure/cert-manager-issuers` | Creates ClusterIssuer and Certificates | `cert-manager-webhook-ionos` |
 | `gateway-config` | `./cluster/infrastructure/gateway-config` | Configures Gateway, listeners, HTTPRoutes, redirects | `infrastructure`, `cert-manager-issuers` |
-| `apps` | `./cluster/apps` | Deploys applications (Grafana, Prometheus, notifierwhatsapp) | `gateway-config` |
+| `apps` | `./cluster/apps` | Deploys applications (Grafana, Prometheus, notifierwhatsapp, MySQL) | `gateway-config` |
 
 ### Why `infrastructure/kustomization.yaml` only includes `gateway-api`
 
