@@ -1,6 +1,6 @@
 ---
-# LoadBalancer service exposing the NetFlow collector to the MikroTik routers.
-# UDP flow records are pushed from the routers to this endpoint.
+# LoadBalancer service exposing the NetFlow collector to the MikroTik routers
+# and to Prometheus for metrics scraping.
 apiVersion: v1
 kind: Service
 metadata:
@@ -19,3 +19,7 @@ spec:
       port: 2055
       targetPort: 2055
       protocol: UDP
+    - name: metrics
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
