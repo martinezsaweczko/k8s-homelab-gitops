@@ -9,3 +9,5 @@ resources:
   - cert-manager-issuers.yaml
   - gateway-config.yaml
   - apps.yaml
+  - image-automation-deploy-key.sops.yaml
+  - image-automation-gitrepo.yaml

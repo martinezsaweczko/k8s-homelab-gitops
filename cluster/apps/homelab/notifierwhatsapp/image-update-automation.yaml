@@ -7,7 +7,7 @@ spec:
   interval: 1m
   sourceRef:
     kind: GitRepository
-    name: k8s-homelab-gitops
+    name: k8s-homelab-gitops-writable
     namespace: flux-system
   git:
     checkout:

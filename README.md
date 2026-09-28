@@ -408,6 +408,30 @@ To use IPFIX instead of NetFlow v9:
 | `goflow2_flow_decoder_error_total` | Decoder errors |
 | `goflow2_flow_dropped_packets_total` | Packets dropped before processing |
 
+### Note: ImageUpdateAutomation required a writable Git source
+
+During deployment, the `apps` Kustomization was stuck because `ImageUpdateAutomation/notifierwhatsapp` could not authenticate to GitHub to push the `flux-image-updates` branch. The cluster's main `GitRepository` only has read access.
+
+The fix is in `cluster/flux-system/`:
+
+- `image-automation-deploy-key.sops.yaml` — SOPS-encrypted SSH deploy key with write access.
+- `image-automation-gitrepo.yaml` — writable `GitRepository` named `k8s-homelab-gitops-writable` using SSH.
+- `cluster/apps/homelab/notifierwhatsapp/image-update-automation.yaml` now references the writable source.
+
+The public key to add to GitHub as a deploy key with **Write access**:
+
+```text
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICescug5yC7VeV9vr9TFjB9joUT4sOAh7cuvkhgdEwuZ flux-image-automation
+```
+
+To add it:
+
+1. Go to `https://github.com/martinezsaweczko/k8s-homelab-gitops/settings/keys`
+2. Click **Add deploy key**
+3. Paste the public key above
+4. Check **Allow write access**
+5. Click **Add key**
+
 ## Image Updates
 
 Flux `ImageUpdateAutomation` watches the GitHub Container Registry (GHCR) for new image tags and automatically updates this repository. See the `image-policies/` directory for configuration.

@@ -1,0 +1,16 @@
+---
+# Writable Git source for Flux ImageUpdateAutomation.
+# Uses an SSH deploy key with write access so the automation can push
+# image-update commits to the flux-image-updates branch.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: k8s-homelab-gitops-writable
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: ssh://git@github.com/martinezsaweczko/k8s-homelab-gitops.git
+  ref:
+    branch: main
+  secretRef:
+    name: image-automation-deploy-key
