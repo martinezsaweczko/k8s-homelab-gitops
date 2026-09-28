@@ -1,0 +1,21 @@
+---
+# LoadBalancer service exposing the NetFlow collector to the MikroTik routers.
+# UDP flow records are pushed from the routers to this endpoint.
+apiVersion: v1
+kind: Service
+metadata:
+  name: netflow
+  namespace: monitoring
+  labels:
+    app: netflow
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: "172.26.20.36"
+spec:
+  type: LoadBalancer
+  selector:
+    app: netflow
+  ports:
+    - name: netflow
+      port: 2055
+      targetPort: 2055
+      protocol: UDP

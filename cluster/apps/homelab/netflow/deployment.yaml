@@ -1,0 +1,61 @@
+---
+# NetFlow/IPFIX collector using GoFlow2.
+# Receives flow records from MikroTik routers and exposes Prometheus metrics.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netflow
+  namespace: monitoring
+  labels:
+    app: netflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netflow
+  template:
+    metadata:
+      labels:
+        app: netflow
+    spec:
+      containers:
+        - name: goflow2
+          image: netsampler/goflow2:latest
+          imagePullPolicy: Always
+          args:
+            # Listen for NetFlow v9 / IPFIX on UDP 2055.
+            - -listen
+            - netflow://:2055
+            # Expose Prometheus metrics.
+            - -metrics.addr
+            - :8080
+            # Discard decoded flow JSON to avoid noisy logs.
+            # Metrics are still generated. Flow data itself is not persisted.
+            - -transport.file
+            - /dev/null
+          ports:
+            - name: netflow
+              containerPort: 2055
+              protocol: UDP
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10

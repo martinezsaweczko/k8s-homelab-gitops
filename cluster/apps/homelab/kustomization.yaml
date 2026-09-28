@@ -4,3 +4,4 @@ resources:
   - notifierwhatsapp
   - monitoring
   - mysql
+  - netflow

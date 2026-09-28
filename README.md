@@ -323,6 +323,91 @@ kubectl get deployment -n <namespace> <deployment-name> -o jsonpath='{.spec.temp
 4. Add the directory to `cluster/apps/homelab/kustomization.yaml`
 5. Commit and push — Flux will deploy automatically
 
+## NetFlow Collection
+
+The cluster runs a lightweight NetFlow/IPFIX collector based on [GoFlow2](https://github.com/netsampler/goflow2). It receives flow records from the MikroTik routers and exposes Prometheus metrics, which are visualized in the Grafana dashboard **NetFlow Overview**.
+
+### Why GoFlow2?
+
+- No extra database (no ClickHouse/Akvorado).
+- Integrates directly with the existing Prometheus + Grafana stack.
+- Runs as a single container in Kubernetes.
+
+> **Limitation:** GoFlow2 exposes collector-level metrics (flow volume, packet/record counts, decode errors). It does **not** store or expose per-flow dimensions such as individual source/destination IPs, ports, or protocols. For full flow analytics, a dedicated flow database such as ntopng Enterprise, Akvorado, or ClickHouse would be required.
+
+### Architecture
+
+```
+MikroTik routers ──UDP NetFlow v9/IPFIX──► netflow-collector (LoadBalancer 172.26.20.36:2055)
+                                                    │
+                                                    ▼
+                                           Prometheus metrics :8080/metrics
+                                                    │
+                                                    ▼
+                                            Grafana "NetFlow Overview"
+```
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `cluster/apps/homelab/netflow/deployment.yaml` | GoFlow2 Deployment |
+| `cluster/apps/homelab/netflow/service.yaml` | LoadBalancer service, UDP 2055 |
+| `cluster/apps/homelab/monitoring/helmrelease.yaml` | Prometheus retention (30d) + `additionalServiceMonitor` for netflow |
+| `cluster/apps/homelab/monitoring/dashboards/netflow-overview.json` | Grafana dashboard |
+| `cluster/apps/homelab/monitoring/kustomization.yaml` | Dashboard provisioning via `configMapGenerator` |
+
+### MikroTik RouterOS configuration
+
+On each MikroTik that should export flows:
+
+```routeros
+/ip traffic-flow set enabled=yes
+/ip traffic-flow set active-flow-timeout=1m
+/ip traffic-flow set inactive-flow-timeout=15s
+
+/ip traffic-flow target add dst-address=172.26.20.36 port=2055 version=9
+```
+
+To use IPFIX instead of NetFlow v9:
+
+```routeros
+/ip traffic-flow target add dst-address=172.26.20.36 port=2055 version=ipfix
+```
+
+### Verification
+
+1. Check the collector pod is running:
+   ```bash
+   kubectl get pods -n monitoring -l app=netflow
+   ```
+2. Check Prometheus is scraping the target:
+   ```bash
+   kubectl get servicemonitor -n monitoring netflow
+   ```
+3. Inspect metrics locally:
+   ```bash
+   kubectl port-forward -n monitoring svc/netflow 8080:8080
+   curl localhost:8080/metrics
+   ```
+4. On the MikroTik, verify the target and active flows:
+   ```bash
+   /ip traffic-flow print
+   /ip traffic-flow target print
+   ```
+5. Open Grafana and look for the **NetFlow Overview** dashboard.
+
+### Useful metrics
+
+| Metric | Description |
+|--------|-------------|
+| `goflow2_flow_traffic_bytes_total` | Bytes received by the collector |
+| `goflow2_flow_traffic_packets_total` | Packets received by the collector |
+| `goflow2_flow_process_nf_total` | NetFlow packets processed by router |
+| `goflow2_flow_process_nf_flowset_records_total` | Flow records processed |
+| `goflow2_flow_decoder_error_total` | Decoder errors |
+| `goflow2_flow_dropped_packets_total` | Packets dropped before processing |
+
 ## Image Updates
 
 Flux `ImageUpdateAutomation` watches the GitHub Container Registry (GHCR) for new image tags and automatically updates this repository. See the `image-policies/` directory for configuration.
