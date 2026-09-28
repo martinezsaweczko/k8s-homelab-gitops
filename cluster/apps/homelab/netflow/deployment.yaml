@@ -26,8 +26,8 @@ spec:
             # Listen for NetFlow v9 / IPFIX on UDP 2055.
             - -listen
             - netflow://:2055
-            # Expose Prometheus metrics.
-            - -metrics.addr
+            # HTTP server address for Prometheus metrics.
+            - -addr
             - :8080
             # Discard decoded flow JSON to avoid noisy logs.
             # Metrics are still generated. Flow data itself is not persisted.
