@@ -35,9 +35,9 @@ spec:
     serviceDns:
       mixedService: true
       type: LoadBalancer
-      loadBalancerIP: 172.26.20.37
       externalTrafficPolicy: Local
       annotations:
+        metallb.universe.tf/address-pool: homelab-pool
         metallb.universe.tf/loadBalancerIPs: "172.26.20.37"
 
     # Web UI is only exposed inside the cluster; Gateway API terminates TLS.
