@@ -13,5 +13,5 @@ spec:
     - "pihole.martinez-saweczko.es"
   rules:
     - backendRefs:
-        - name: pihole-web
+        - name: pihole-pihole-web
           port: 80
