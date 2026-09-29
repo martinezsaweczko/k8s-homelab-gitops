@@ -27,7 +27,8 @@ cluster/
     └── homelab/              # Applications deployed to the homelab cluster
         ├── notifierwhatsapp/
         ├── monitoring/       # Prometheus + Grafana
-        └── mysql/            # MySQL database
+        ├── mysql/            # MySQL database
+        └── pihole/           # Pi-hole DNS sinkhole
 ```
 
 ## Flux Kustomization Layers & Dependencies
@@ -53,7 +54,7 @@ cluster (root Kustomization, reconciles everything)
 │   └── cert-manager-webhook-ionos
 │       └── cert-manager-issuers  # ClusterIssuer + Certificate
 └── gateway-config        # depends on infrastructure + cert-manager-issuers
-    └── apps              # Grafana, Prometheus, notifierwhatsapp
+    └── apps              # Grafana, Prometheus, notifierwhatsapp, Pi-hole
 ```
 
 ### Layer descriptions
@@ -66,7 +67,7 @@ cluster (root Kustomization, reconciles everything)
 | `cert-manager-webhook-ionos` | `./cluster/infrastructure/cert-manager-webhook-ionos` | Installs IONOS DNS webhook for DNS-01 challenges | `cert-manager` |
 | `cert-manager-issuers` | `./cluster/infrastructure/cert-manager-issuers` | Creates ClusterIssuer and Certificates | `cert-manager-webhook-ionos` |
 | `gateway-config` | `./cluster/infrastructure/gateway-config` | Configures Gateway, listeners, HTTPRoutes, redirects | `infrastructure`, `cert-manager-issuers` |
-| `apps` | `./cluster/apps` | Deploys applications (Grafana, Prometheus, notifierwhatsapp, MySQL) | `gateway-config` |
+| `apps` | `./cluster/apps` | Deploys applications (Grafana, Prometheus, notifierwhatsapp, MySQL, Pi-hole) | `gateway-config` |
 
 ### Why `infrastructure/kustomization.yaml` only includes `gateway-api`
 
@@ -267,6 +268,7 @@ Flux will upgrade the release automatically.
 | Envoy Gateway | `cluster/infrastructure/gateway-api/envoy-gateway-helmrelease.yaml` |
 | kube-prometheus-stack | `cluster/apps/homelab/monitoring/helmrelease.yaml` |
 | prometheus-snmp-exporter | `cluster/apps/homelab/monitoring/snmp-exporter-helmrelease.yaml` |
+| pihole | `cluster/apps/homelab/pihole/helmrelease.yaml` |
 
 ### Upgrading Flux components
 
@@ -407,6 +409,61 @@ To use IPFIX instead of NetFlow v9:
 | `goflow2_flow_process_nf_flowset_records_total` | Flow records processed |
 | `goflow2_flow_decoder_error_total` | Decoder errors |
 | `goflow2_flow_dropped_packets_total` | Packets dropped before processing |
+
+## Pi-hole DNS
+
+The cluster runs [Pi-hole](https://pi-hole.net/) as a network-wide DNS sinkhole using the [MoJo2600 Helm chart](https://github.com/MoJo2600/pihole-kubernetes). DNS queries are served on a dedicated MetalLB IP, while the web admin interface is exposed through the existing Envoy Gateway with a Let's Encrypt certificate.
+
+### Architecture
+
+```
+Clients / router ──UDP/TCP 53──► pihole-pihole-dns (LoadBalancer 172.26.20.37:53)
+                                         │
+                                         ▼
+                              Pi-hole pods (persistent /etc/pihole)
+                                         │
+                                         ▼
+                    Web admin via Envoy Gateway HTTPS (172.26.20.34:443)
+                                         │
+                                         ▼
+                         https://pihole.martinez-saweczko.es/admin
+```
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `cluster/apps/homelab/pihole/namespace.yaml` | `pihole` namespace |
+| `cluster/apps/homelab/pihole/helmrepository.yaml` | MoJo2600 Helm repository |
+| `cluster/apps/homelab/pihole/helmrelease.yaml` | Pi-hole HelmRelease |
+| `cluster/apps/homelab/pihole/httproute.yaml` | Gateway API route for the web UI |
+| `cluster/apps/homelab/pihole/pihole-admin-secret.sops.yaml` | SOPS-encrypted admin password |
+| `cluster/infrastructure/cert-manager-issuers/certificate-pihole.yaml` | TLS certificate for `pihole.martinez-saweczko.es` |
+| `cluster/infrastructure/gateway-config/pihole-https-redirect.yaml` | HTTP → HTTPS redirect |
+
+### Configuration
+
+- **DNS LoadBalancer IP**: `172.26.20.37`
+- **Web UI**: `https://pihole.martinez-saweczko.es/admin`
+- **Upstream DNS**: Cloudflare (`1.1.1.1`, `1.0.0.1`)
+- **DHCP**: Disabled; the router handles DHCP
+- **Persistence**: 1 Gi PVC on `ceph-csi-rbd`
+
+### Verification
+
+1. Check the DNS service has the expected external IP:
+   ```bash
+   kubectl get svc -n pihole pihole-pihole-dns
+   ```
+2. Check the web route and certificate:
+   ```bash
+   kubectl get httproute -n pihole pihole
+   kubectl get certificate -n gateway pihole-tls
+   ```
+3. Verify DNS resolution against Pi-hole:
+   ```bash
+   nslookup example.com 172.26.20.37
+   ```
 
 ### Note: ImageUpdateAutomation required a writable Git source
 
