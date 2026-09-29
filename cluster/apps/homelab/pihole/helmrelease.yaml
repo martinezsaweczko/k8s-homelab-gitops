@@ -1,0 +1,67 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pihole
+  namespace: flux-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: pihole
+      version: "2.38.x"
+      sourceRef:
+        kind: HelmRepository
+        name: mojo2600
+        namespace: flux-system
+      interval: 12h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  targetNamespace: pihole
+  values:
+    # Web UI virtual host used by lighttpd.
+    virtualHost: pihole.martinez-saweczko.es
+
+    # Admin password is provided via a pre-existing SOPS-encrypted secret.
+    admin:
+      existingSecret: pihole-admin
+      passwordKey: password
+
+    # DNS service exposed on a dedicated MetalLB IP.
+    serviceDns:
+      mixedService: true
+      type: LoadBalancer
+      loadBalancerIP: 172.26.20.37
+      externalTrafficPolicy: Local
+      annotations:
+        metallb.universe.tf/loadBalancerIPs: "172.26.20.37"
+
+    # Web UI is only exposed inside the cluster; Gateway API terminates TLS.
+    serviceWeb:
+      type: ClusterIP
+      https:
+        enabled: false
+
+    # DHCP is handled by the router, not Pi-hole.
+    serviceDhcp:
+      enabled: false
+
+    # Upstream DNS servers (Cloudflare).
+    DNS1: "1.1.1.1"
+    DNS2: "1.0.0.1"
+
+    # Ensure FTL listens on all interfaces (required for LoadBalancer / ClusterIP).
+    extraEnvVars:
+      FTLCONF_dns_listeningMode: "all"
+
+    # Persist Pi-hole configuration and blocklists.
+    persistentVolumeClaim:
+      enabled: true
+      storageClass: ceph-csi-rbd
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi

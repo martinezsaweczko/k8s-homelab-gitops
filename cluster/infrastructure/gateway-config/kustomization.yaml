@@ -5,3 +5,4 @@ resources:
   - envoyproxy.yaml
   - gateway.yaml
   - grafana-https-redirect.yaml
+  - pihole-https-redirect.yaml

@@ -4,3 +4,4 @@ resources:
   - secret-ionos.sops.yaml
   - clusterissuer.yaml
   - certificate-grafana.yaml
+  - certificate-pihole.yaml
