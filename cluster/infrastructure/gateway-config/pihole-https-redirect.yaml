@@ -6,7 +6,7 @@ metadata:
   namespace: gateway
 spec:
   parentRefs:
-    - name: homelab-gateway
+    - name: homelab-gateway-internal
       namespace: gateway
       sectionName: http
   hostnames:

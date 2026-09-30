@@ -2,7 +2,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: homelab-gateway
+  name: homelab-gateway-internal
   namespace: gateway
 spec:
   gatewayClassName: envoy-gateway
@@ -10,7 +10,7 @@ spec:
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
-      name: homelab-proxy-config
+      name: homelab-internal-proxy-config
   addresses:
     - type: IPAddress
       value: 172.26.20.34
@@ -30,6 +30,8 @@ spec:
           - name: grafana-tls
             namespace: gateway
           - name: pihole-tls
+            namespace: gateway
+          - name: notifierwhatsapp-tls
             namespace: gateway
       allowedRoutes:
         namespaces:

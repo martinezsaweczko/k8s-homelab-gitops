@@ -2,7 +2,7 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:
-  name: homelab-proxy-config
+  name: homelab-internal-proxy-config
   namespace: gateway
 spec:
   provider:

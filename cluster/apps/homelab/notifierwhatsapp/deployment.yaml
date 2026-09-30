@@ -24,7 +24,7 @@ spec:
             - -http-address=0.0.0.0
             - -whatsapp-session-db=/data/whatsapp.db
             - -o11-prometheus-path=/metrics
-            - -swagger-host=172.26.20.33:8080
+            - -swagger-host=notifierwhatsapp.martinez-saweczko.es
           ports:
             - name: http
               containerPort: 8080

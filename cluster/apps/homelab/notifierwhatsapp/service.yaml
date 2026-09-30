@@ -6,8 +6,7 @@ metadata:
   labels:
     app: notifierwhatsapp
 spec:
-  type: LoadBalancer
-  loadBalancerIP: 172.26.20.33
+  type: ClusterIP
   selector:
     app: notifierwhatsapp
   ports:

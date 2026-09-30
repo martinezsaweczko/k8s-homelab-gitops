@@ -5,3 +5,4 @@ resources:
   - clusterissuer.yaml
   - certificate-grafana.yaml
   - certificate-pihole.yaml
+  - certificate-notifierwhatsapp.yaml

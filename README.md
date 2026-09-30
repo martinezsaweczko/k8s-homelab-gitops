@@ -325,6 +325,47 @@ kubectl get deployment -n <namespace> <deployment-name> -o jsonpath='{.spec.temp
 4. Add the directory to `cluster/apps/homelab/kustomization.yaml`
 5. Commit and push — Flux will deploy automatically
 
+## Internal Envoy Gateway
+
+The cluster uses a single internal Envoy Gateway (`homelab-gateway-internal` at `172.26.20.34`) for all HTTPS web interfaces. It is **not** NATed to the internet, so every `HTTPRoute` attached to it is reachable only from inside the LAN.
+
+### Why a single internal Gateway?
+
+- **Security by default**: web UIs are not accidentally exposed to the internet.
+- **One internal entry point**: all internal web apps share one MetalLB IP and one TLS termination point.
+- **Easy to split later**: if a service needs to be public, a second public Gateway can be added and only that service's `HTTPRoute` moved.
+
+### How web apps are exposed
+
+```
+LAN client ──► 172.26.20.34:443 (homelab-gateway-internal LoadBalancer)
+                        │
+                        ▼
+                HTTPRoute matches hostname
+                        │
+                        ▼
+                ClusterIP Service (e.g. grafana, pihole-web, notifierwhatsapp)
+```
+
+### Current internal web services
+
+| Hostname | Backend | Purpose |
+|---|---|---|
+| `grafana.martinez-saweczko.es` | `monitoring-kube-prometheus-stack-grafana:80` | Grafana dashboards |
+| `pihole.martinez-saweczko.es` | `pihole-pihole-web:80` | Pi-hole admin UI |
+| `notifierwhatsapp.martinez-saweczko.es` | `notifierwhatsapp:8080` | notifierwhatsapp API / Swagger |
+
+### Dedicated app LoadBalancers
+
+Some services need their own LoadBalancer IP rather than going through the Gateway:
+
+| IP | Service | Purpose |
+|---|---|---|
+| `172.26.20.34` | Envoy Gateway proxy | Internal HTTPS entry point |
+| `172.26.20.35` | MySQL | Database access |
+| `172.26.20.36` | NetFlow collector | UDP NetFlow/IPFIX from MikroTik |
+| `172.26.20.37` | Pi-hole DNS | TCP/UDP DNS sinkhole |
+
 ## NetFlow Collection
 
 The cluster runs a lightweight NetFlow/IPFIX collector based on [GoFlow2](https://github.com/netsampler/goflow2). It receives flow records from the MikroTik routers and exposes Prometheus metrics, which are visualized in the Grafana dashboard **NetFlow Overview**.
@@ -412,7 +453,7 @@ To use IPFIX instead of NetFlow v9:
 
 ## Pi-hole DNS
 
-The cluster runs [Pi-hole](https://pi-hole.net/) as a network-wide DNS sinkhole using the [MoJo2600 Helm chart](https://github.com/MoJo2600/pihole-kubernetes). DNS queries are served on a dedicated MetalLB IP, while the web admin interface is exposed through the existing Envoy Gateway with a Let's Encrypt certificate.
+The cluster runs [Pi-hole](https://pi-hole.net/) as a network-wide DNS sinkhole using the [MoJo2600 Helm chart](https://github.com/MoJo2600/pihole-kubernetes). DNS queries are served on a dedicated MetalLB IP, while the web admin interface is exposed through the internal Envoy Gateway with a Let's Encrypt certificate.
 
 ### Architecture
 
@@ -423,10 +464,10 @@ Clients / router ──UDP/TCP 53──► pihole-pihole-dns (LoadBalancer 172.2
                               Pi-hole pods (persistent /etc/pihole)
                                          │
                                          ▼
-                    Web admin via Envoy Gateway HTTPS (172.26.20.34:443)
-                                         │
-                                         ▼
-                         https://pihole.martinez-saweczko.es/admin
+                     Web admin via internal Envoy Gateway HTTPS (172.26.20.34:443)
+                                          │
+                                          ▼
+                          https://pihole.martinez-saweczko.es/admin
 ```
 
 ### Files
