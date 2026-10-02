@@ -364,7 +364,7 @@ Some services need their own LoadBalancer IP rather than going through the Gatew
 | `172.26.20.34` | Envoy Gateway proxy | Internal HTTPS entry point |
 | `172.26.20.35` | MySQL | Database access |
 | `172.26.20.36` | NetFlow collector | UDP NetFlow/IPFIX from MikroTik |
-| `172.26.20.34` | Pi-hole DNS | TCP/UDP DNS sinkhole |
+
 
 ## NetFlow Collection
 

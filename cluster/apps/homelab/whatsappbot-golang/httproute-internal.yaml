@@ -14,4 +14,4 @@ spec:
   rules:
     - backendRefs:
         - name: whatsappbot-golang
-          port: 80
+          port: 9000
