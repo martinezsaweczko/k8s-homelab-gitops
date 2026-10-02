@@ -4,6 +4,6 @@ metadata:
   name: whatsappbot-golang
   namespace: flux-system
 spec:
-  image: ghcr.io/martinezsaweczko/whatsappbot-golang
+  image: ghcr.io/martinezsaweczko/whatsapp-golang
   interval: 1m
   provider: generic

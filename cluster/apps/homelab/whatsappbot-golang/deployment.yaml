@@ -41,7 +41,7 @@ spec:
       containers:
         - name: whatsappbot-golang
           # Flux ImagePolicy: flux-system/whatsappbot-golang
-          image: ghcr.io/martinezsaweczko/whatsappbot-golang:v0.0.0 # {"$imagepolicy": "flux-system:whatsappbot-golang"}
+          image: ghcr.io/martinezsaweczko/whatsapp-golang:v0.0.0 # {"$imagepolicy": "flux-system:whatsappbot-golang"}
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
