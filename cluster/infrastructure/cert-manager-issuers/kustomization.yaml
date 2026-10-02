@@ -6,3 +6,4 @@ resources:
   - certificate-grafana.yaml
   - certificate-pihole.yaml
   - certificate-notifierwhatsapp.yaml
+  - certificate-whatsappbot.yaml

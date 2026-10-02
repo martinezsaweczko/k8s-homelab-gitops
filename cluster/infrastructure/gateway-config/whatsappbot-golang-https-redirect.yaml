@@ -1,0 +1,38 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whatsappbot-golang-public-https-redirect
+  namespace: gateway
+spec:
+  parentRefs:
+    - name: homelab-gateway-public
+      namespace: gateway
+      sectionName: http
+  hostnames:
+    - "kiosk.martinez-saweczko.es"
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whatsappbot-golang-internal-https-redirect
+  namespace: gateway
+spec:
+  parentRefs:
+    - name: homelab-gateway-internal
+      namespace: gateway
+      sectionName: http
+  hostnames:
+    - "whatsappbot.martinez-saweczko.es"
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

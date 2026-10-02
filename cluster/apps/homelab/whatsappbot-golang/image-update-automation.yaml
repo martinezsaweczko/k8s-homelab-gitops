@@ -1,0 +1,23 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: whatsappbot-golang
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: k8s-homelab-gitops-writable
+    namespace: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: Flux Bot
+        email: flux@martinezsaweczko.com
+      messageTemplate: |
+        chore: update whatsappbot-golang image to {{ .AutomationObject }}
+    push:
+      branch: flux-image-updates

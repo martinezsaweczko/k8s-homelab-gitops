@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whatsappbot-golang
+  namespace: whatsappbot-golang
+data:
+  # Public file server (downloads)
+  HTTP_ADDRESS: "0.0.0.0"
+  HTTP_PORT: "46565"
+
+  # Internal API / metrics / health
+  INTERNAL_ADDRESS: "0.0.0.0"
+  INTERNAL_PORT: "9000"
+
+  # Public base URL used when generating JWT download links.
+  # Must match the public HTTPRoute hostname and use the gateway HTTPS port (443).
+  URL_SERVER: "kiosk.martinez-saweczko.es"
+
+  # Kiosk folders and retention (hours)
+  NACIONAL_FOLDER: "/data/pdfs/nacional/"
+  RETENTION_NACIONAL: "24"
+  INTERNACIONAL_FOLDER: "/data/pdfs/internacional/"
+  RETENTION_INTERNACIONAL: "169"
+  MAGAZINE_FOLDER: "/data/pdfs/magazine/"
+  RETENTION_MAGAZINE: "720"
+
+  # Storage
+  DB_DRIVER: "mysql"
+  DB_AUTO_CREATE: "false"
+  SESSION_DB_PATH: "/data/session/session.db"
+
+  # Observability
+  LOG_LEVEL: "info"
+  O11_PROMETHEUS_PATH: "/metrics"
+  O11_ENVIRONMENT: "prod"
+  O11_TRACER_ENDPOINT: ""  # e.g. tempo.monitoring.svc.cluster.local:4317
+
+  # Scheduler
+  SCHEDULER_TIMEZONE: "Europe/Madrid"
+  SCHEDULER_ENABLED: "true"
+
+  # Channel PDF defaults
+  PDF_CATEGORY: "nacional"

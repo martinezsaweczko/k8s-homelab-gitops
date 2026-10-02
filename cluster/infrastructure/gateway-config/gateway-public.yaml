@@ -2,7 +2,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: homelab-gateway-internal
+  name: homelab-gateway-public
   namespace: gateway
 spec:
   gatewayClassName: envoy-gateway
@@ -10,10 +10,10 @@ spec:
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
-      name: homelab-internal-proxy-config
+      name: homelab-public-proxy-config
   addresses:
     - type: IPAddress
-      value: 172.26.20.34
+      value: 172.26.20.37
   listeners:
     - name: http
       protocol: HTTP
@@ -27,12 +27,6 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: grafana-tls
-            namespace: gateway
-          - name: pihole-tls
-            namespace: gateway
-          - name: notifierwhatsapp-tls
-            namespace: gateway
           - name: whatsappbot-golang-tls
             namespace: gateway
       allowedRoutes:

@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whatsappbot-golang
+  namespace: whatsappbot-golang
+  labels:
+    app: whatsappbot-golang
+spec:
+  # IMPORTANT: WhatsApp session DB is SQLite and cannot be opened by multiple
+  # replicas at the same time. Keep replicas=1 or use a leader-election sidecar.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whatsappbot-golang
+  template:
+    metadata:
+      labels:
+        app: whatsappbot-golang
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      initContainers:
+        - name: mkdirs
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /data/pdfs/nacional /data/pdfs/internacional /data/pdfs/magazine /data/session
+              chown -R 1001:1001 /data
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: session
+              mountPath: /data/session
+            - name: pdfs
+              mountPath: /data/pdfs
+      containers:
+        - name: whatsappbot-golang
+          # Flux ImagePolicy: flux-system/whatsappbot-golang
+          image: ghcr.io/martinezsaweczko/whatsappbot-golang:v0.0.0 # {"$imagepolicy": "flux-system:whatsappbot-golang"}
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: whatsappbot-golang
+            - secretRef:
+                name: whatsappbot-golang
+          args:
+            - -http-address=$(HTTP_ADDRESS)
+            - -http-port=$(HTTP_PORT)
+            - -internal-address=$(INTERNAL_ADDRESS)
+            - -internal-port=$(INTERNAL_PORT)
+            - -url-server=$(URL_SERVER)
+            - -nacional-folder=$(NACIONAL_FOLDER)
+            - -internacional-folder=$(INTERNACIONAL_FOLDER)
+            - -magazine-folder=$(MAGAZINE_FOLDER)
+            - -retention-nacional=$(RETENTION_NACIONAL)
+            - -retention-internacional=$(RETENTION_INTERNACIONAL)
+            - -retention-magazine=$(RETENTION_MAGAZINE)
+            - -db-driver=$(DB_DRIVER)
+            - -db-dsn=$(DB_DSN)
+            - -db-auto-create=$(DB_AUTO_CREATE)
+            - -session-db-path=$(SESSION_DB_PATH)
+            - -jwt-public-key-path=/app/keys/public.pem
+            - -jwt-private-key-path=/app/keys/private.pem
+            - -bot-number=$(BOT_NUMBER)
+            - -bot-notification-jid=$(BOT_NOTIFICATION_JID)
+            - -bot-mentioned-number=$(BOT_MENTIONED_NUMBER)
+            - -bot-troll-numbers=$(BOT_TROLL_NUMBERS)
+            - -bot-pair-phone=$(BOT_PAIR_PHONE)
+            - -openai-api-key=$(OPENAI_API_KEY)
+            - -weather-api-key=$(WEATHER_API_KEY)
+            - -stability-api-key=$(STABILITY_API_KEY)
+            - -esios-api-key=$(ESIOS_API_KEY)
+            - -pdf-channel-jid=$(PDF_CHANNEL_JID)
+            - -pdf-category=$(PDF_CATEGORY)
+            - -log-level=$(LOG_LEVEL)
+            - -o11-prometheus-path=$(O11_PROMETHEUS_PATH)
+            - -o11-environment=$(O11_ENVIRONMENT)
+            - -o11-tracer-endpoint=$(O11_TRACER_ENDPOINT)
+            - -scheduler-timezone=$(SCHEDULER_TIMEZONE)
+            - -scheduler-enabled=$(SCHEDULER_ENABLED)
+          ports:
+            - name: public
+              containerPort: 46565
+              protocol: TCP
+            - name: internal
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: internal
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: internal
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          volumeMounts:
+            - name: session
+              mountPath: /data/session
+            - name: pdfs
+              mountPath: /data/pdfs
+            - name: jwt-keys
+              mountPath: /app/keys
+              readOnly: true
+      volumes:
+        - name: session
+          persistentVolumeClaim:
+            claimName: whatsapp-session
+        - name: pdfs
+          persistentVolumeClaim:
+            claimName: whatsappbot-pdfs
+        - name: jwt-keys
+          secret:
+            secretName: whatsappbot-golang
+            items:
+              - key: jwt-public.pem
+                path: public.pem
+              - key: jwt-private.pem
+                path: private.pem

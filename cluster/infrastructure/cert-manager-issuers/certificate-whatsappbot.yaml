@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: whatsappbot-golang-tls
+  namespace: gateway
+spec:
+  secretName: whatsappbot-golang-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "kiosk.martinez-saweczko.es"
+    - "whatsappbot.martinez-saweczko.es"

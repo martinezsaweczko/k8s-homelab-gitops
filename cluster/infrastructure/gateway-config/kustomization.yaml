@@ -3,6 +3,9 @@ kind: Kustomization
 resources:
   - gatewayclass.yaml
   - envoyproxy.yaml
+  - envoyproxy-public.yaml
   - gateway.yaml
+  - gateway-public.yaml
   - grafana-https-redirect.yaml
   - pihole-https-redirect.yaml
+  - whatsappbot-golang-https-redirect.yaml
