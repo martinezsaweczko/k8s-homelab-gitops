@@ -27,10 +27,15 @@ jobs:
           git fetch origin flux-image-updates
 
           # Create PR if it doesn't exist; ignore error if it already exists
+          # Use the latest commit message as the PR title/body so it works for
+          # any app updated by Flux ImageUpdateAutomation.
+          PR_TITLE=$(git log -1 --format=%s origin/flux-image-updates)
+          PR_BODY=$(git log -1 --format=%b origin/flux-image-updates)
+
           gh pr create \
             --base main \
             --head flux-image-updates \
-            --title "chore: update notifierwhatsapp image" \
-            --body "Automated image update from Flux." \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
             --repo ${{ github.repository }} \
             || true
