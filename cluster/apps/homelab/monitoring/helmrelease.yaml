@@ -100,7 +100,7 @@ spec:
             matchNames:
               - whatsappbot-golang
           endpoints:
-            - port: metrics
+            - targetPort: 9000
               path: /metrics
               interval: 30s
               scrapeTimeout: 10s
