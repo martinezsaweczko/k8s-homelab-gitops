@@ -92,7 +92,19 @@ spec:
               path: /metrics
               interval: 30s
               scrapeTimeout: 10s
-
+        - name: whatsappbot-golang
+          selector:
+            matchLabels:
+              app: whatsappbot-golang
+          namespaceSelector:
+            matchNames:
+              - whatsappbot-golang
+          endpoints:
+            - port: metrics
+              path: /metrics
+              interval: 30s
+              scrapeTimeout: 10s
+              
     alertmanager:
       enabled: false
 
