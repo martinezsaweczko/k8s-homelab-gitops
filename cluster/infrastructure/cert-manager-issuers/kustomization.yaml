@@ -7,3 +7,4 @@ resources:
   - certificate-pihole.yaml
   - certificate-notifierwhatsapp.yaml
   - certificate-whatsappbot.yaml
+  - certificate-stirling-pdf.yaml

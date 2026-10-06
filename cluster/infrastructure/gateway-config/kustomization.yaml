@@ -9,3 +9,4 @@ resources:
   - grafana-https-redirect.yaml
   - pihole-https-redirect.yaml
   - whatsappbot-golang-https-redirect.yaml
+  - stirling-pdf-https-redirect.yaml

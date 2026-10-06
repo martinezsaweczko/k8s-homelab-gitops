@@ -35,6 +35,8 @@ spec:
             namespace: gateway
           - name: whatsappbot-golang-tls
             namespace: gateway
+          - name: stirling-pdf-tls
+            namespace: gateway
       allowedRoutes:
         namespaces:
           from: All
