@@ -1,0 +1,56 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tempo
+  namespace: flux-system
+spec:
+  interval: 1h
+  dependsOn:
+    - name: kube-prometheus-stack
+      namespace: flux-system
+  chart:
+    spec:
+      chart: tempo
+      version: "1.24.4"
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      interval: 12h
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  targetNamespace: monitoring
+  values:
+    # Monolithic (single-binary) Tempo. No Gateway/HTTPRoute exposure:
+    # ingestion and query stay cluster-internal via the ClusterIP Service.
+    service:
+      type: ClusterIP
+    # Local-disk storage backend on the same storage class Prometheus's
+    # own PVC uses. Explicitly not MinIO/S3.
+    persistence:
+      enabled: true
+      storageClassName: ceph-csi-rbd
+      size: 20Gi
+    tempo:
+      storage:
+        trace:
+          backend: local
+          local:
+            path: /var/tempo/traces
+          wal:
+            path: /var/tempo/wal
+      # OTLP receivers for apps to send traces directly, no OTel Collector.
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: "0.0.0.0:4317"
+            http:
+              endpoint: "0.0.0.0:4318"
