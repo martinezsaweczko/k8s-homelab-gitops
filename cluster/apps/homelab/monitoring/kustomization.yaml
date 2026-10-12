@@ -5,6 +5,9 @@ resources:
   - helmrepository.yaml
   - helmrelease.yaml
   - snmp-exporter-helmrelease.yaml
+  - tempo-helmrepository.yaml
+  - tempo-helmrelease.yaml
+  - tempo-datasource-configmap.yaml
   - httproute.yaml
   - grafana-admin-secret.sops.yaml
 
