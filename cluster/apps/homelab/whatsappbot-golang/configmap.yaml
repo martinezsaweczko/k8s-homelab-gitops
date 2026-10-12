@@ -33,7 +33,7 @@ data:
   LOG_LEVEL: "info"
   O11_PROMETHEUS_PATH: "/metrics"
   O11_ENVIRONMENT: "prod"
-  O11_TRACER_ENDPOINT: ""  # e.g. tempo.monitoring.svc.cluster.local:4317
+  O11_TRACER_ENDPOINT: "tempo.monitoring.svc.cluster.local:4317"
 
   # Scheduler
   SCHEDULER_TIMEZONE: "Europe/Madrid"
