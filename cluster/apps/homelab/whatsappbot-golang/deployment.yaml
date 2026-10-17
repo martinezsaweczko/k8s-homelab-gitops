@@ -75,6 +75,7 @@ spec:
             - -weather-api-key=$(WEATHER_API_KEY)
             - -stability-api-key=$(STABILITY_API_KEY)
             - -esios-api-key=$(ESIOS_API_KEY)
+            - -quote-api-key=$(QUOTE_API_KEY)
             - -pdf-channel-jid=$(PDF_CHANNEL_JID)
             - -pdf-category=$(PDF_CATEGORY)
             - -log-level=$(LOG_LEVEL)
