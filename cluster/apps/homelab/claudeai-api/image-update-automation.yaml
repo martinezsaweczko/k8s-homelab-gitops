@@ -21,7 +21,10 @@ spec:
         chore: update claudeai-api image to {{ .AutomationObject }}
     push:
       branch: flux-image-updates
-  update:
-    # Scope the Setters strategy to this app only.
-    path: ./cluster/apps/homelab/claudeai-api
-    strategy: Setters
+  # No "update" block, same as the other apps: the controller works on the
+  # flux-image-updates branch, which can be older than main (it is only
+  # recreated from main after its PR is merged and the branch is deleted). An
+  # explicit update.path then points at a directory that does not exist there
+  # and the automation fails (ImageUpdateAutomation not Ready, apps layer
+  # unhealthy). With the default (repo root) a stale branch simply means "nothing
+  # to update yet". The marker in deployment.yaml already scopes the change.
