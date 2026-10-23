@@ -10,7 +10,6 @@ resources:
   - tempo-datasource-configmap.yaml
   - httproute.yaml
   - grafana-admin-secret.sops.yaml
-  - claudeai-api-scrape.sops.yaml
 
 configMapGenerator:
   - name: grafana-dashboard-mikrotik-14420

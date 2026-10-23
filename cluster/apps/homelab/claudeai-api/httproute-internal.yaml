@@ -13,10 +13,8 @@ spec:
     - "claudeai.martinez-saweczko.es"
   rules:
     # Everything is routed, including /metrics and the skills admin endpoints.
-    # They are protected by the app itself: with CLAUDEAI_API_KEYS set, /v1,
-    # /metrics and /api/v1/skills* require "Authorization: Bearer <key>"; only
-    # health, version and the docs are public. This relies on the key staying
-    # non-empty in the Secret: an empty value would disable auth in the app.
+    # The app runs WITHOUT API keys (see deployment.yaml), so all of it is open
+    # to whoever can reach this LAN-only hostname.
     - matches:
         - path:
             type: PathPrefix

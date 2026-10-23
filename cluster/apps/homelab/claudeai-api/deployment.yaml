@@ -49,19 +49,23 @@ spec:
             - -skills-repo=git@github.com:davidmartdom/claudeAI-API-skills.git
             - -skills-ssh-key=/run/secrets/skills_deploy_key
             - -skills-known-hosts=/run/secrets/known_hosts
-          # Only these two keys are exposed as env vars. No envFrom: the Secret
+          # Only the Claude token is exposed as an env var. No envFrom: the Secret
           # also holds the SSH key files, which must not leak into the environment.
+          #
+          # CLAUDEAI_API_KEYS is deliberately NOT set: the service runs without
+          # client authentication because it is only reachable on the LAN
+          # (internal gateway). Anyone who can reach the host can use the Claude
+          # subscription and the metrics/skills endpoints. To turn auth back on, add
+          #   - name: CLAUDEAI_API_KEYS
+          #     valueFrom: {secretKeyRef: {name: claudeai-api, key: CLAUDEAI_API_KEYS}}
+          # (the key is still stored, unused, in secret.sops.yaml) and restore the
+          # Bearer "authorization" block of the claudeai-api ServiceMonitor.
           env:
             - name: CLAUDE_CODE_OAUTH_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: claudeai-api
                   key: CLAUDE_CODE_OAUTH_TOKEN
-            - name: CLAUDEAI_API_KEYS
-              valueFrom:
-                secretKeyRef:
-                  name: claudeai-api
-                  key: CLAUDEAI_API_KEYS
           ports:
             - name: http
               containerPort: 46564
