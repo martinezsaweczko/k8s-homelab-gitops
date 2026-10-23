@@ -104,6 +104,25 @@ spec:
               path: /metrics
               interval: 30s
               scrapeTimeout: 10s
+        - name: claudeai-api
+          selector:
+            matchLabels:
+              app: claudeai-api
+          namespaceSelector:
+            matchNames:
+              - claudeai-api
+          endpoints:
+            - port: http
+              path: /metrics
+              interval: 30s
+              scrapeTimeout: 10s
+              # /metrics requires the API key: token comes from the Secret
+              # claudeai-api-scrape (namespace monitoring, key "token").
+              authorization:
+                type: Bearer
+                credentials:
+                  name: claudeai-api-scrape
+                  key: token
               
     alertmanager:
       enabled: false

@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: claudeai-api
+  namespace: claudeai-api
+  labels:
+    app: claudeai-api
+spec:
+  # Stateless service (skills cache is disposable), but keep a single replica:
+  # every replica would run its own skills sync and share the Claude login quota.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: claudeai-api
+  template:
+    metadata:
+      labels:
+        app: claudeai-api
+    spec:
+      # The app never talks to the Kubernetes API.
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      # The app shuts down gracefully within 30s; leave headroom for SIGKILL.
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: claudeai-api
+          # Flux ImagePolicy: flux-system/claudeai-api
+          image: ghcr.io/martinezsaweczko/claudeai-api:0.1.0 # {"$imagepolicy": "flux-system:claudeai-api"}
+          imagePullPolicy: IfNotPresent
+          args:
+            # Required in a container: the default bind address is 127.0.0.1.
+            - -http-address=0.0.0.0
+            - -http-port=46564
+            - -claude-max-concurrency=3
+            # "search" only. Do NOT use "full": WebFetch from a cluster pod is an SSRF risk.
+            - -claude-web=search
+            # Traces go to the in-cluster Tempo (OTLP gRPC), same as whatsappbot-golang.
+            # Metrics are scraped from /metrics (ServiceMonitor), so no extra flag there.
+            - -o11-tracer-endpoint=monitoring-tempo.monitoring.svc.cluster.local:4317
+            - -o11-environment=prod
+            - -skills-dir=/var/lib/claudeai-api/skills
+            - -skills-repo=git@github.com:davidmartdom/claudeAI-API-skills.git
+            - -skills-ssh-key=/run/secrets/skills_deploy_key
+            - -skills-known-hosts=/run/secrets/known_hosts
+          # Only these two keys are exposed as env vars. No envFrom: the Secret
+          # also holds the SSH key files, which must not leak into the environment.
+          env:
+            - name: CLAUDE_CODE_OAUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: claudeai-api
+                  key: CLAUDE_CODE_OAUTH_TOKEN
+            - name: CLAUDEAI_API_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: claudeai-api
+                  key: CLAUDEAI_API_KEYS
+          ports:
+            - name: http
+              containerPort: 46564
+              protocol: TCP
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          # The initial skills sync can take up to ~20s: tolerate 12 x 5s = 60s.
+          startupProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Each concurrent claude CLI process needs roughly 300-500Mi, so with
+          # -claude-max-concurrency=3 the 2Gi limit leaves room for the app itself.
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+          volumeMounts:
+            - name: secrets
+              mountPath: /run/secrets
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            - name: home
+              mountPath: /home/appuser
+            - name: state
+              mountPath: /var/lib/claudeai-api
+      volumes:
+        # Mounts ONLY the two file keys. With fsGroup 1001 the files end up owned
+        # root:1001 with mode 0440. OpenSSH accepts this (it only rejects a key
+        # that is group/other-readable AND owned by the invoking user); verified
+        # locally with podman running as uid 1001 against this exact image, so no
+        # initContainer is needed to copy the key.
+        - name: secrets
+          secret:
+            secretName: claudeai-api
+            # 288 decimal == 0440 octal (r--r-----). Written in decimal because
+            # the Kubernetes API takes JSON integers and YAML octal is ambiguous.
+            defaultMode: 288
+            items:
+              - key: skills_deploy_key
+                path: skills_deploy_key
+              - key: known_hosts
+                path: known_hosts
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi
+        # Claude CLI writes its config under $HOME.
+        - name: home
+          emptyDir:
+            sizeLimit: 256Mi
+        # Skills clone + materialized versions. Disposable cache, re-synced on start.
+        - name: state
+          emptyDir:
+            sizeLimit: 1Gi

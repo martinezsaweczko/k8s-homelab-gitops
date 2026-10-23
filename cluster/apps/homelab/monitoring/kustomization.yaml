@@ -10,6 +10,7 @@ resources:
   - tempo-datasource-configmap.yaml
   - httproute.yaml
   - grafana-admin-secret.sops.yaml
+  - claudeai-api-scrape.sops.yaml
 
 configMapGenerator:
   - name: grafana-dashboard-mikrotik-14420
@@ -32,6 +33,14 @@ configMapGenerator:
     namespace: monitoring
     files:
       - dashboards/netflow-overview.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      disableNameSuffixHash: true
+  - name: grafana-dashboard-claudeai-api
+    namespace: monitoring
+    files:
+      - dashboards/claudeai-api.json
     options:
       labels:
         grafana_dashboard: "1"
