@@ -353,6 +353,7 @@ LAN client ──► 172.26.20.34:443 (homelab-gateway-internal LoadBalancer)
 |---|---|---|
 | `grafana.martinez-saweczko.es` | `monitoring-kube-prometheus-stack-grafana:80` | Grafana dashboards |
 | `pihole.martinez-saweczko.es` | `pihole-pihole-web:80` | Pi-hole admin UI |
+| `claudeai.martinez-saweczko.es` | `claudeai-api:46564` | claudeai-api (only `/v1`, `/docs`, health and version paths) |
 | `notifierwhatsapp.martinez-saweczko.es` | `notifierwhatsapp:8080` | notifierwhatsapp API / Swagger |
 
 ### Dedicated app LoadBalancers

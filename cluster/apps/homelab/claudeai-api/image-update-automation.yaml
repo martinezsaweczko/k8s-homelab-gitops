@@ -1,0 +1,27 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: claudeai-api
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: k8s-homelab-gitops-writable
+    namespace: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: Flux Bot
+        email: flux@martinezsaweczko.com
+      messageTemplate: |
+        chore: update claudeai-api image to {{ .AutomationObject }}
+    push:
+      branch: flux-image-updates
+  update:
+    # Scope the Setters strategy to this app only.
+    path: ./cluster/apps/homelab/claudeai-api
+    strategy: Setters
