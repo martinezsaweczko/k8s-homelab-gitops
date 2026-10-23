@@ -37,6 +37,8 @@ spec:
             namespace: gateway
           - name: stirling-pdf-tls
             namespace: gateway
+          - name: claudeai-api-tls
+            namespace: gateway
       allowedRoutes:
         namespaces:
           from: All
