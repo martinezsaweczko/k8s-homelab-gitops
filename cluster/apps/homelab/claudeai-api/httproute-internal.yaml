@@ -12,24 +12,15 @@ spec:
   hostnames:
     - "claudeai.martinez-saweczko.es"
   rules:
-    # Only the client-facing paths are exposed. /metrics, /api/v1/skills and
-    # /api/v1/skills/refresh are intentionally NOT routed (in-cluster only).
+    # Everything is routed, including /metrics and the skills admin endpoints.
+    # They are protected by the app itself: with CLAUDEAI_API_KEYS set, /v1,
+    # /metrics and /api/v1/skills* require "Authorization: Bearer <key>"; only
+    # health, version and the docs are public. This relies on the key staying
+    # non-empty in the Secret: an empty value would disable auth in the app.
     - matches:
         - path:
             type: PathPrefix
-            value: /v1
-        - path:
-            type: PathPrefix
-            value: /api/v1/docs
-        - path:
-            type: PathPrefix
-            value: /docs
-        - path:
-            type: PathPrefix
-            value: /api/v1/health
-        - path:
-            type: PathPrefix
-            value: /api/v1/version
+            value: /
       # LLM calls and SSE streams can last minutes (app default timeout is 5m).
       # Without this, Envoy's default route timeout (15s) would cut them off.
       timeouts:
