@@ -41,6 +41,10 @@ spec:
             - -claude-max-concurrency=3
             # "search" only. Do NOT use "full": WebFetch from a cluster pod is an SSRF risk.
             - -claude-web=search
+            # Traces go to the in-cluster Tempo (OTLP gRPC), same as whatsappbot-golang.
+            # Metrics are scraped from /metrics (ServiceMonitor), so no extra flag there.
+            - -o11-tracer-endpoint=monitoring-tempo.monitoring.svc.cluster.local:4317
+            - -o11-environment=prod
             - -skills-dir=/var/lib/claudeai-api/skills
             - -skills-repo=git@github.com:davidmartdom/claudeAI-API-skills.git
             - -skills-ssh-key=/run/secrets/skills_deploy_key
