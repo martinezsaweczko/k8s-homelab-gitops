@@ -29,6 +29,10 @@ data:
   DB_AUTO_CREATE: "false"
   SESSION_DB_PATH: "/data/session/session.db"
 
+  # AI fallback: in-cluster OpenAI-compatible server (claudeai-api)
+  OPENAI_BASE_URL: "http://claudeai-api.claudeai-api.svc.cluster.local:46564/v1"
+  OPENAI_MODEL: "haiku"
+
   # Observability
   LOG_LEVEL: "info"
   O11_PROMETHEUS_PATH: "/metrics"

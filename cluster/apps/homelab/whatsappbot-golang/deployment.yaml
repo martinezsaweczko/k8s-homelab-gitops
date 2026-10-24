@@ -72,6 +72,8 @@ spec:
             - -bot-troll-numbers=$(BOT_TROLL_NUMBERS)
             - -bot-pair-phone=$(BOT_PAIR_PHONE)
             - -openai-api-key=$(OPENAI_API_KEY)
+            - -openai-base-url=$(OPENAI_BASE_URL)
+            - -openai-model=$(OPENAI_MODEL)
             - -weather-api-key=$(WEATHER_API_KEY)
             - -stability-api-key=$(STABILITY_API_KEY)
             - -esios-api-key=$(ESIOS_API_KEY)
