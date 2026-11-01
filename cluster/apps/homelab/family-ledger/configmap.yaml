@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: family-ledger
+  namespace: family-ledger
+data:
+  # Extra origin allowed to submit forms (the app also accepts same-host requests).
+  TRUSTED_ORIGINS: "https://finanzas.martinez-saweczko.es"
+
+  # AI categorisation: in-cluster OpenAI-compatible server (claudeai-api).
+  # The app appends /v1/chat/completions itself, so no /v1 here.
+  AI_BASE_URL: "http://claudeai-api.claudeai-api.svc.cluster.local:46564"
+  AI_MODEL: "haiku"

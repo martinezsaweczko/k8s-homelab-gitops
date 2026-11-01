@@ -1,0 +1,19 @@
+---
+# Internal only: finanzas.martinez-saweczko.es is resolved by the router's static DNS to the
+# internal gateway. There is intentionally no public route for this app.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: family-ledger-internal
+  namespace: family-ledger
+spec:
+  parentRefs:
+    - name: homelab-gateway-internal
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - "finanzas.martinez-saweczko.es"
+  rules:
+    - backendRefs:
+        - name: family-ledger
+          port: 3000

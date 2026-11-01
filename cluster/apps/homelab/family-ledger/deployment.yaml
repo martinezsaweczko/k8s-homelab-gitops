@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: family-ledger
+  namespace: family-ledger
+  labels:
+    app: family-ledger
+spec:
+  # IMPORTANT: the app runs migrations and generates recurring entries on start,
+  # so keep a single replica to avoid concurrent migrations.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: family-ledger
+  template:
+    metadata:
+      labels:
+        app: family-ledger
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: family-ledger
+          # Flux ImagePolicy: flux-system/family-ledger
+          image: ghcr.io/martinezsaweczko/family-ledger:0.1.2 # {"$imagepolicy": "flux-system:family-ledger"}
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: family-ledger
+            - secretRef:
+                name: family-ledger
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

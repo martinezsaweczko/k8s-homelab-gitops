@@ -39,6 +39,8 @@ spec:
             namespace: gateway
           - name: claudeai-api-tls
             namespace: gateway
+          - name: family-ledger-tls
+            namespace: gateway
       allowedRoutes:
         namespaces:
           from: All

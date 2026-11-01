@@ -4,6 +4,7 @@ resources:
   - claudeai-api
   - notifierwhatsapp
   - whatsappbot-golang
+  - family-ledger
   - monitoring
   - mysql
   - netflow

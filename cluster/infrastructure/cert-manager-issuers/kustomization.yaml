@@ -9,3 +9,4 @@ resources:
   - certificate-whatsappbot.yaml
   - certificate-stirling-pdf.yaml
   - certificate-claudeai-api.yaml
+  - certificate-family-ledger.yaml
