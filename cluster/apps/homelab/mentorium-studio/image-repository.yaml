@@ -1,0 +1,12 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: mentorium-studio
+  namespace: flux-system
+spec:
+  image: ghcr.io/martinezsaweczko/mentorium_studio
+  interval: 1m
+  provider: generic
+  # Private GHCR package: dockerconfigjson secret in flux-system (see README).
+  secretRef:
+    name: ghcr-pull

@@ -325,6 +325,31 @@ kubectl get deployment -n <namespace> <deployment-name> -o jsonpath='{.spec.temp
 4. Add the directory to `cluster/apps/homelab/kustomization.yaml`
 5. Commit and push — Flux will deploy automatically
 
+## mentorium-studio
+
+SvelteKit (adapter-node) app, exposed publicly at `https://mentorium.martinez-saweczko.es` through `homelab-gateway-public` (cert `mentorium-studio-tls`, HTTP->HTTPS redirect in `gateway-config`). It uses the external MySQL at `mysql.martinez-saweczko.es:3306`, runs a single replica (`Recreate`, in-process worker) and its image `ghcr.io/martinezsaweczko/mentorium_studio` is a **private** GHCR package updated by Flux image automation (`ImageRepository`/`ImagePolicy`/`ImageUpdateAutomation` in `flux-system`).
+
+Files: `cluster/apps/homelab/mentorium-studio/` (plus `certificate-mentorium-studio.yaml` and `mentorium-studio-https-redirect.yaml` in infrastructure).
+
+### Secrets (templates only until encrypted)
+
+The app dir ships unencrypted templates that are **not** referenced by any kustomization: `secret.sops.yaml.example` (`DATABASE_URL`, `BETTER_AUTH_SECRET`, `SHOP_ENCRYPTION_KEY`, `ANTHROPIC_API_KEY`) and `ghcr-pull-secret.sops.yaml.example`. The `.example` suffix keeps them out of the `.sops.yaml` creation rule. Never commit real values in an `.example` file.
+
+1. Private image pull secret `ghcr-pull` (type `kubernetes.io/dockerconfigjson`, GitHub PAT with `read:packages`) is needed in **two** namespaces: `mentorium-studio` (pod `imagePullSecrets`) and `flux-system` (`ImageRepository.spec.secretRef`, which must live in the ImageRepository namespace).
+2. Create the real files from the templates, e.g.:
+
+```bash
+cd cluster/apps/homelab/mentorium-studio
+cp secret.sops.yaml.example secret.sops.yaml          # fill in real values
+# ghcr-pull-secret.sops.yaml  -> the mentorium-studio copy (Secret in ns mentorium-studio)
+# the flux-system copy goes in a separate file under cluster/flux-system/ (e.g. ghcr-pull-mentorium-studio.sops.yaml)
+sops --encrypt --in-place secret.sops.yaml
+sops --encrypt --in-place ghcr-pull-secret.sops.yaml
+```
+
+3. Verify the age recipient in the encrypted file matches the one used by the existing secrets (`sops` picks the nearest `.sops.yaml`, so check both the root and `cluster/.sops.yaml`).
+4. Add `secret.sops.yaml` and `ghcr-pull-secret.sops.yaml` to the app `kustomization.yaml` (see the marker comment), add the flux-system secret to the `flux-system` kustomization, and delete the plaintext files. `apps` is `wait: true`, so a workload that never becomes Ready (missing secret / pull failure) blocks the whole `apps` Kustomization.
+
 ## Internal Envoy Gateway
 
 The cluster uses a single internal Envoy Gateway (`homelab-gateway-internal` at `172.26.20.34`) for all HTTPS web interfaces. It is **not** NATed to the internet, so every `HTTPRoute` attached to it is reachable only from inside the LAN.

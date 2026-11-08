@@ -10,4 +10,5 @@ resources:
   - gateway-config.yaml
   - apps.yaml
   - image-automation-deploy-key.sops.yaml
+  - ghcr-pull-mentorium-studio.sops.yaml
   - image-automation-gitrepo.yaml

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mentorium-studio
+  namespace: mentorium-studio
+data:
+  # Public origin (SvelteKit adapter-node CSRF check + absolute URLs).
+  ORIGIN: "https://mentorium.martinez-saweczko.es"
+  PORT: "3000"
+  ANTHROPIC_MODEL: "claude-opus-5-5"
