@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mentorium-studio
+  namespace: mentorium-studio
+  labels:
+    app: mentorium-studio
+spec:
+  # IMPORTANT: the app runs an in-process worker, so keep a single replica
+  # (Recreate avoids two workers overlapping during a rollout).
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mentorium-studio
+  template:
+    metadata:
+      labels:
+        app: mentorium-studio
+    spec:
+      # Private GHCR package: pull secret lives in this namespace (see README).
+      imagePullSecrets:
+        - name: ghcr-pull
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: mentorium-studio
+          # Flux ImagePolicy: flux-system/mentorium-studio
+          image: ghcr.io/martinezsaweczko/mentorium_studio:0.1.0 # {"$imagepolicy": "flux-system:mentorium-studio"}
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: mentorium-studio
+            - secretRef:
+                name: mentorium-studio
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

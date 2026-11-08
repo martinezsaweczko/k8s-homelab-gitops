@@ -10,3 +10,4 @@ resources:
   - netflow
   - pihole
   - stirling-pdf
+  - mentorium-studio

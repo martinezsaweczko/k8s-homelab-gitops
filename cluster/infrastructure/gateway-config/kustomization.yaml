@@ -12,3 +12,4 @@ resources:
   - stirling-pdf-https-redirect.yaml
   - claudeai-api-https-redirect.yaml
   - family-ledger-https-redirect.yaml
+  - mentorium-studio-https-redirect.yaml

@@ -29,6 +29,8 @@ spec:
         certificateRefs:
           - name: whatsappbot-golang-tls
             namespace: gateway
+          - name: mentorium-studio-tls
+            namespace: gateway
       allowedRoutes:
         namespaces:
           from: All
