@@ -26,7 +26,7 @@ spec:
       containers:
         - name: family-ledger
           # Flux ImagePolicy: flux-system/family-ledger
-          image: ghcr.io/martinezsaweczko/family-ledger:0.2.0 # {"$imagepolicy": "flux-system:family-ledger"}
+          image: ghcr.io/martinezsaweczko/family-ledger:0.3.0 # {"$imagepolicy": "flux-system:family-ledger"}
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
