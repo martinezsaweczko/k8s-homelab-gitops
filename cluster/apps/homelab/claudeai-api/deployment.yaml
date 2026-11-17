@@ -32,7 +32,7 @@ spec:
       containers:
         - name: claudeai-api
           # Flux ImagePolicy: flux-system/claudeai-api
-          image: ghcr.io/martinezsaweczko/claudeai-api:0.1.0 # {"$imagepolicy": "flux-system:claudeai-api"}
+          image: ghcr.io/martinezsaweczko/claudeai-api:0.1.1 # {"$imagepolicy": "flux-system:claudeai-api"}
           imagePullPolicy: IfNotPresent
           args:
             # Required in a container: the default bind address is 127.0.0.1.
