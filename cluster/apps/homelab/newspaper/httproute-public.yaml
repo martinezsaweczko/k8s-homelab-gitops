@@ -1,0 +1,19 @@
+---
+# Public: kiosko.martinez-saweczko.es is exposed through the public gateway (Google sign-in and
+# the public /privacidad and /condiciones pages for the OAuth consent screen).
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: newspaper-public
+  namespace: newspaper
+spec:
+  parentRefs:
+    - name: homelab-gateway-public
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - "kiosko.martinez-saweczko.es"
+  rules:
+    - backendRefs:
+        - name: newspaper
+          port: 3000

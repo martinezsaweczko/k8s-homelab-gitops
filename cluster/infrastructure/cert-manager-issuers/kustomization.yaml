@@ -11,3 +11,4 @@ resources:
   - certificate-claudeai-api.yaml
   - certificate-family-ledger.yaml
   - certificate-mentorium-studio.yaml
+  - certificate-newspaper.yaml

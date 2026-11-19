@@ -1,0 +1,10 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: newspaper
+  namespace: flux-system
+spec:
+  # Public GHCR package: no pull secret.
+  image: ghcr.io/martinezsaweczko/newspaper
+  interval: 1m
+  provider: generic

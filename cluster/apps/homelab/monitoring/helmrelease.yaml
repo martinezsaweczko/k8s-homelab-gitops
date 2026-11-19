@@ -116,6 +116,20 @@ spec:
               path: /metrics
               interval: 30s
               scrapeTimeout: 10s
+        # newspaper: /metrics on its own port; the app only answers pod-network sources
+        # (METRICS_ALLOW=10.244.0.0/16).
+        - name: newspaper
+          selector:
+            matchLabels:
+              app: newspaper
+          namespaceSelector:
+            matchNames:
+              - newspaper
+          endpoints:
+            - port: metrics
+              path: /metrics
+              interval: 30s
+              scrapeTimeout: 10s
     alertmanager:
       enabled: false
 

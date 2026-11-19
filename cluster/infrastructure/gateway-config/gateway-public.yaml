@@ -31,6 +31,8 @@ spec:
             namespace: gateway
           - name: mentorium-studio-tls
             namespace: gateway
+          - name: newspaper-tls
+            namespace: gateway
       allowedRoutes:
         namespaces:
           from: All

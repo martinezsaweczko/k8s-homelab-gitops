@@ -1,0 +1,36 @@
+# Read-only static view of whatsappbot-golang's PDF volume (PVC whatsappbot-pdfs), so the
+# newspaper app can serve the same files. A PVC cannot be mounted across namespaces, so this PV
+# points at the same CephFS subvolume path with its own volumeHandle.
+#
+# SAFETY: reclaim policy Retain and readOnly. Deleting the newspaper PVC or this PV never
+# deletes the data; the files belong to whatsappbot-golang.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: newspaper-pdfs-ro
+spec:
+  capacity:
+    storage: 120Gi
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  volumeMode: Filesystem
+  claimRef:
+    namespace: newspaper
+    name: newspaper-pdfs
+  csi:
+    driver: cephfs.csi.ceph.com
+    # Unique handle: never reuse the original PV's volumeHandle.
+    volumeHandle: newspaper-pdfs-ro
+    readOnly: true
+    # Static volumes stage with userID/userKey from this secret (managed by the k8s-homelab
+    # Ansible role k8s-ceph-csi).
+    nodeStageSecretRef:
+      name: ceph-secret
+      namespace: ceph-csi-cephfs
+    volumeAttributes:
+      clusterID: "1ae85e60-8b61-4de9-9d05-aa7285434c25"
+      fsName: "cephfs"
+      staticVolume: "true"
+      rootPath: "/volumes/csi/csi-vol-09b18d51-e2fb-43e4-9e0d-b23a35486678/a636fb80-f87b-4f43-b1a1-3170f726b494"
