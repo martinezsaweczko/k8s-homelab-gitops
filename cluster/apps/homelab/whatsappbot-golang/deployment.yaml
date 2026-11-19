@@ -41,7 +41,7 @@ spec:
       containers:
         - name: whatsappbot-golang
           # Flux ImagePolicy: flux-system/whatsappbot-golang
-          image: ghcr.io/martinezsaweczko/whatsapp-golang:0.5.1 # {"$imagepolicy": "flux-system:whatsappbot-golang"}
+          image: ghcr.io/martinezsaweczko/whatsapp-golang:0.6.0 # {"$imagepolicy": "flux-system:whatsappbot-golang"}
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -60,6 +60,9 @@ spec:
             - -retention-nacional=$(RETENTION_NACIONAL)
             - -retention-internacional=$(RETENTION_INTERNACIONAL)
             - -retention-magazine=$(RETENTION_MAGAZINE)
+            - -kiosk-cleanup-enabled=$(KIOSK_CLEANUP_ENABLED)
+            - -kiosk-cleanup-max-age=$(KIOSK_CLEANUP_MAX_AGE)
+            - -kiosk-cleanup-schedule=$(KIOSK_CLEANUP_SCHEDULE)
             - -db-driver=$(DB_DRIVER)
             - -db-dsn=$(DB_DSN)
             - -db-auto-create=$(DB_AUTO_CREATE)
@@ -74,6 +77,8 @@ spec:
             - -openai-api-key=$(OPENAI_API_KEY)
             - -openai-base-url=$(OPENAI_BASE_URL)
             - -openai-model=$(OPENAI_MODEL)
+            - -ai-context-days=$(AI_CONTEXT_DAYS)
+            - -ai-context-max-chars=$(AI_CONTEXT_MAX_CHARS)
             - -weather-api-key=$(WEATHER_API_KEY)
             - -stability-api-key=$(STABILITY_API_KEY)
             - -esios-api-key=$(ESIOS_API_KEY)
