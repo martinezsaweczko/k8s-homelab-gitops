@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: newspaper
+  namespace: newspaper
+data:
+  # The shared newspaper PDFs (whatsappbot-golang's CephFS volume, read-only). The app reads the
+  # nacional/, internacional/ and magazine/ subfolders; regions come from regions.json, not folders.
+  NEWSPAPER_DIR: "/newspapers"
+  # users.json, regions.json and the rendered front pages (PVC newspaper-data).
+  DATA_DIR: "/data"
+  PUBLIC_ORIGIN: "https://kiosko.martinez-saweczko.es"
+  COOKIE_SECURE: "true"
+  AUTH_DISABLED: "false"
+  # Become approved admins on their first Google sign-in.
+  ADMIN_EMAILS: "bonkilla@gmail.com"
+  # Prometheus /metrics on its own port, only for pod-network sources (the ServiceMonitor scrape).
+  METRICS_PORT: "9464"
+  METRICS_ALLOW: "10.244.0.0/16"
+  # Traces to Tempo over OTLP/HTTP (the app exports http/protobuf only).
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://monitoring-tempo.monitoring.svc.cluster.local:4318"
+  OTEL_SERVICE_NAME: "newspaper"

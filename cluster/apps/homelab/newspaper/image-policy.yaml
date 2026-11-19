@@ -1,0 +1,14 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: newspaper
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: newspaper
+  # Release tags X.Y.Z only (the pipeline also pushes X.Y and latest, which never match).
+  filterTags:
+    pattern: '^\d+\.\d+\.\d+$'
+  policy:
+    semver:
+      range: ">=0.1.1"

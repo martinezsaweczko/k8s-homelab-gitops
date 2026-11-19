@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newspaper
+  namespace: newspaper
+  labels:
+    app: newspaper
+spec:
+  # IMPORTANT: the app applies database migrations on start and keeps the login throttle and the
+  # user cache in memory, so keep a single replica (Recreate: never two pods at once; the data
+  # PVC is ReadWriteOnce).
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: newspaper
+  template:
+    metadata:
+      labels:
+        app: newspaper
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        # the image's `node` user
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: newspaper
+          # Flux ImagePolicy: flux-system/newspaper
+          image: ghcr.io/martinezsaweczko/newspaper:0.1.1 # {"$imagepolicy": "flux-system:newspaper"}
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: newspaper
+            - secretRef:
+                name: newspaper
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: metrics
+              containerPort: 9464
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: pdfs
+              mountPath: /newspapers
+              readOnly: true
+          # /login is public and cheap; the start waits for MySQL and applies migrations.
+          startupProbe:
+            httpGet:
+              path: /login
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet:
+              path: /login
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /login
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          # pdftoppm renders front pages inside this container (small concurrency cap in the app):
+          # the memory limit keeps a pathological PDF from taking the node down.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              cpu: "1"
+              memory: 768Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: newspaper-data
+        - name: pdfs
+          persistentVolumeClaim:
+            claimName: newspaper-pdfs
+            readOnly: true

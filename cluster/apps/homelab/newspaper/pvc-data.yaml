@@ -1,0 +1,13 @@
+# users.json, regions.json, ignore list and the cached front pages (thumbs/).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: newspaper-data
+  namespace: newspaper
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-csi-rbd
+  resources:
+    requests:
+      storage: 5Gi
