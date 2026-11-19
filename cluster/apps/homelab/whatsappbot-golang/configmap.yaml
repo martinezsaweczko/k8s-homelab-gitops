@@ -24,6 +24,11 @@ data:
   MAGAZINE_FOLDER: "/data/pdfs/magazine/"
   RETENTION_MAGAZINE: "720"
 
+  # Kiosk cleanup: delete files older than the max age (hours), daily (cron)
+  KIOSK_CLEANUP_ENABLED: "true"
+  KIOSK_CLEANUP_MAX_AGE: "720"
+  KIOSK_CLEANUP_SCHEDULE: "0 4 * * *"
+
   # Storage
   DB_DRIVER: "mysql"
   DB_AUTO_CREATE: "false"
@@ -32,6 +37,9 @@ data:
   # AI fallback: in-cluster OpenAI-compatible server (claudeai-api)
   OPENAI_BASE_URL: "http://claudeai-api.claudeai-api.svc.cluster.local:46564/v1"
   OPENAI_MODEL: "haiku"
+  # Group conversation sent as context: last N days, newest first up to N chars
+  AI_CONTEXT_DAYS: "180"
+  AI_CONTEXT_MAX_CHARS: "400000"
 
   # Observability
   LOG_LEVEL: "info"
