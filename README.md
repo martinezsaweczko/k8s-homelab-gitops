@@ -390,6 +390,7 @@ Some services need their own LoadBalancer IP rather than going through the Gatew
 | `172.26.20.34` | Envoy Gateway proxy | Internal HTTPS entry point |
 | `172.26.20.35` | MySQL | Database access |
 | `172.26.20.36` | NetFlow collector | UDP NetFlow/IPFIX from MikroTik |
+| `172.26.20.38` | Pi-hole DNS | DNS sinkhole (UDP/TCP 53) |
 
 
 ## NetFlow Collection
@@ -484,7 +485,7 @@ The cluster runs [Pi-hole](https://pi-hole.net/) as a network-wide DNS sinkhole 
 ### Architecture
 
 ```
-Clients / router ──UDP/TCP 53──► pihole-pihole-dns (LoadBalancer 172.26.20.37:53)
+Clients / router ──UDP/TCP 53──► pihole-pihole-dns (LoadBalancer 172.26.20.38:53)
                                          │
                                          ▼
                               Pi-hole pods (persistent /etc/pihole)
@@ -510,7 +511,7 @@ Clients / router ──UDP/TCP 53──► pihole-pihole-dns (LoadBalancer 172.2
 
 ### Configuration
 
-- **DNS LoadBalancer IP**: `172.26.20.37`
+- **DNS LoadBalancer IP**: `172.26.20.38`
 - **Web UI**: `https://pihole.martinez-saweczko.es/admin`
 - **Upstream DNS**: Cloudflare (`1.1.1.1`, `1.0.0.1`)
 - **DHCP**: Disabled; the router handles DHCP
@@ -529,7 +530,7 @@ Clients / router ──UDP/TCP 53──► pihole-pihole-dns (LoadBalancer 172.2
    ```
 3. Verify DNS resolution against Pi-hole:
    ```bash
-   nslookup example.com 172.26.20.37
+   nslookup example.com 172.26.20.38
    ```
 
 ### Note: ImageUpdateAutomation required a writable Git source
