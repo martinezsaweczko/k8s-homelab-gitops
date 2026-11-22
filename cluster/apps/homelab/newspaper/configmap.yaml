@@ -14,9 +14,11 @@ data:
   AUTH_DISABLED: "false"
   # Become approved admins on their first Google sign-in.
   ADMIN_EMAILS: "bonkilla@gmail.com"
-  # Prometheus /metrics on its own port, only for pod-network sources (the ServiceMonitor scrape).
+  # Prometheus /metrics on its own port.
+  # Wide open because the cluster's actual pod CIDR doesn't match the 10.244.0.0/16 default
+  # (Prometheus scrapes were failing from pod IPs like 10.1.251.211, outside that range).
   METRICS_PORT: "9464"
-  METRICS_ALLOW: "10.244.0.0/16"
+  METRICS_ALLOW: "0.0.0.0/0"
   # Traces to Tempo over OTLP/HTTP (the app exports http/protobuf only).
   OTEL_EXPORTER_OTLP_ENDPOINT: "http://monitoring-tempo.monitoring.svc.cluster.local:4318"
   OTEL_SERVICE_NAME: "newspaper"
