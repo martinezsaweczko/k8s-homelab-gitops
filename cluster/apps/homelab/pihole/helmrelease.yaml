@@ -38,7 +38,8 @@ spec:
       externalTrafficPolicy: Local
       annotations:
         metallb.universe.tf/address-pool: homelab-pool
-        metallb.universe.tf/loadBalancerIPs: "172.26.20.37"
+        metallb.universe.tf/loadBalancerIPs: "172.26.20.34"
+        metallb.universe.tf/allow-shared-ip: "homelab-internal-34"
 
     # Web UI is only exposed inside the cluster; Gateway API terminates TLS.
     serviceWeb:

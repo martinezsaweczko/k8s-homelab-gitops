@@ -10,4 +10,5 @@ spec:
     kubernetes:
       envoyService:
         annotations:
+          metallb.universe.tf/allow-shared-ip: "homelab-internal-34"
           metallb.universe.tf/loadBalancerIPs: "172.26.20.34"
