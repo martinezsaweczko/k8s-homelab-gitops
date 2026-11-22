@@ -30,7 +30,7 @@ spec:
       containers:
         - name: newspaper
           # Flux ImagePolicy: flux-system/newspaper
-          image: ghcr.io/martinezsaweczko/newspaper:0.1.1 # {"$imagepolicy": "flux-system:newspaper"}
+          image: ghcr.io/martinezsaweczko/newspaper:0.2.0 # {"$imagepolicy": "flux-system:newspaper"}
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
