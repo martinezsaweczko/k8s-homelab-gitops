@@ -14,6 +14,19 @@ spec:
   hostnames:
     - "kiosko.martinez-saweczko.es"
   rules:
+    # /chat/stream is a Server-Sent Events stream (online status and chat messages) that stays
+    # open while a page is open; the app pings it every 20 s. Without this, Envoy's default route
+    # timeout (15s) would cut it every 15 s and the browser would reconnect. After an hour the
+    # browser reconnects by itself (EventSource), which is harmless.
+    - matches:
+        - path:
+            type: Exact
+            value: /chat/stream
+      timeouts:
+        request: 1h
+      backendRefs:
+        - name: newspaper
+          port: 3000
     - backendRefs:
         - name: newspaper
           port: 3000
